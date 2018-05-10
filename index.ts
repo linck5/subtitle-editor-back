@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({path: '.env.development'});
 import * as bodyParser from 'body-parser';
 import { NestFactory } from '@nestjs/core';
 import { HttpStatus } from '@nestjs/common';
