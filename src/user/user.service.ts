@@ -12,16 +12,13 @@ export class UserService {
     constructor( @InjectModel(UserSchema) private readonly userModel: Model<User>) { }
 
     onModuleInit() {
-      console.log("module ineit");
       // setTimeout(()=>{
-      //   console.log("heroweru9");
-      //
       //   this.addUserTest();
       // },2000)
     }
 
     async FindAll(): Promise<User[]> {
-        return await this.userModel.find();
+      return await this.userModel.find();
     }
 
     async addUserTest(): Promise<User> {
@@ -34,6 +31,6 @@ export class UserService {
     }
 
     async FindUser(user: User): Promise<User> {
-        return await this.userModel.findOne({ username: user.username });
+      return await this.userModel.findOne({ username: user.username });
     }
 }

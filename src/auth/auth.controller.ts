@@ -13,20 +13,16 @@ export class AuthController {
 
         return await this.userService.FindUser(reqBody).then(user => {
 
-            if (!user) {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                    message: 'User Not Found'
-                });
+            if (!user || !compareSync(reqBody.password, user.password)) {
+              res.status(HttpStatus.BAD_REQUEST).json({
+                code: 'authDenied',
+                message: 'User not found or password does not match'
+              });
             }
-            if (!compareSync(reqBody.password, user.password)) {
-
-                res.status(HttpStatus.BAD_REQUEST).json({
-                    message: 'Error in Username or Password'
-                });
-            } else {
-                return res.json(
-                    this.authService.createToken(user)
-                );
+            else {
+              return res.json(
+                this.authService.createToken(user)
+              );
             }
         });
     }
