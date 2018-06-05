@@ -30,6 +30,16 @@ export class UserService {
       return await NewUser.save();
     }
 
+    async GetById(id): Promise<User> {
+      let user:User = null;
+      try {
+        user = await this.userModel.findById(id);
+      }
+      finally {
+        return user;
+      }
+    }
+
     async FindUser(user: User): Promise<User> {
       return await this.userModel.findOne({ username: user.username });
     }
