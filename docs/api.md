@@ -30,8 +30,8 @@ or: `GET /tree/:tree_id/branch/:branch_id/commit/:commit_id/change/:change_id`
 ```
 {
   Username: string,
-  Roles: enum{ADMIN, MODERATOR}[],
   Password: string,
+  Roles: enum{ADMIN, MODERATOR}[],
   Branches: Branch[],
   Creation: Date,
   LastOnline: Date,
