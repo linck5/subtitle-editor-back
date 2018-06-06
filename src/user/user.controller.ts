@@ -1,6 +1,6 @@
-import { Controller, Post, HttpCode, HttpStatus, Param, Res, Req, Get } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, Param, Res, Req, Get, Patch, Body } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { User } from '../user/user.schema';
+import { User, AddUserDTO } from '../user/user.schema';
 
 @Controller()
 export class UserController {
@@ -14,6 +14,17 @@ export class UserController {
       .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
           code: 'noSuchId',
           message: 'User id not found'
+        })
+      );
+  }
+
+  @Post('/users')
+  async Create( @Body() addUserDTO:AddUserDTO, @Res() res) {
+      return await this.userService.AddUser(addUserDTO)
+      .then(addedUser => res.json(addedUser))
+      .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
+          code: 'createError',
+          error: err
         })
       );
   }

@@ -24,8 +24,19 @@ export class UserService {
     async addUserTest(): Promise<User> {
       const NewUser= new this.userModel({
         username: "testUser",
-        admin: true,
-        password: hashSync("password", genSaltSync(10))
+        password: hashSync("password", genSaltSync(10)),
+        roles: ["ADMIN", "MODERATOR"],
+        active: true
+      });
+      return await NewUser.save();
+    }
+
+    async AddUser(user: AddUserDTO): Promise<User> {
+      const NewUser = new this.userModel({
+        username: user.username,
+        password: hashSync(user.password, genSaltSync(10)),
+        roles: user.roles,
+        active: user.active
       });
       return await NewUser.save();
     }

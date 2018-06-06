@@ -29,8 +29,7 @@ export const UserSchema = new Schema({
     required: true
   },
   roles: {
-    type: [String],
-    enum: ['ADMIN', 'MODERATOR'],
+    type: [{ type: String, enum: ['ADMIN', 'MODERATOR'] }]
   },
   //branches: Branch[],
   creation: {
