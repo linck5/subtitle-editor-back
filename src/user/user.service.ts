@@ -31,13 +31,7 @@ export class UserService {
     }
 
     async GetById(id): Promise<User> {
-      let user:User = null;
-      try {
-        user = await this.userModel.findById(id);
-      }
-      finally {
-        return user;
-      }
+      return await this.userModel.findById(id);
     }
 
     async FindUser(user: User): Promise<User> {

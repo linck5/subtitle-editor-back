@@ -9,18 +9,13 @@ export class UserController {
 
   @Get('/user/:user_id')
   async GetById( @Param('user_id') user_id, @Res() res) {
-
-      return await this.userService.GetById(user_id).then(user => {
-          if(user){
-            return res.json(user)
-          }
-          else{
-            return res.status(HttpStatus.BAD_REQUEST).json({
-              code: 'noSuchId',
-              message: 'User id not found'
-            });
-          }
-      });
+      return await this.userService.GetById(user_id)
+      .then(user => res.json(user))
+      .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
+          code: 'noSuchId',
+          message: 'User id not found'
+        })
+      );
   }
 
 }
