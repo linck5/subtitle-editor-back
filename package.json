@@ -7,7 +7,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --watch ./src/server --exec ts-node ./index.ts"
+    "start": "nodemon --watch ./src --exec ts-node ./index.ts"
   },
   "dependencies": {
     "@angular/core": "^5.2.10",
