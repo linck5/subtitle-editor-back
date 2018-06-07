@@ -1,6 +1,6 @@
 import { Model, Error } from 'mongoose';
 import { Component, Inject, BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { UserSchema, User, AddUserDTO } from './user.schema';
+import { UserSchema, User, AddUserDTO, UpdateUserDTO } from './user.schema';
 import { SecretKeysComponent } from '../common/secretKeys.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { genSaltSync, hashSync } from 'bcrypt';
@@ -39,6 +39,10 @@ export class UserService {
         active: user.active
       });
       return await NewUser.save();
+    }
+
+    async UpdateUser(id, user: UpdateUserDTO): Promise<User> {
+      return await this.userModel.findByIdAndUpdate(id, user, {new: true});
     }
 
     async GetById(id): Promise<User> {

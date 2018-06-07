@@ -2,10 +2,17 @@ import { Document, Schema } from 'mongoose';
 
 
 export class AddUserDTO {
-   readonly username: string;
-   readonly password: string;
-   readonly roles: string[];
-   readonly active: boolean;
+  readonly username: string;
+  readonly password: string;
+  readonly roles: string[];
+  readonly active: boolean;
+}
+
+export class UpdateUserDTO {
+  readonly roles: string[];
+  readonly lastOnline: Date;
+  readonly banned: boolean;
+  readonly active: boolean;
 }
 
 export interface User extends Document {

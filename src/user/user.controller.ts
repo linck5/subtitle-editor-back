@@ -1,6 +1,6 @@
 import { Controller, Post, HttpCode, HttpStatus, Param, Res, Req, Get, Patch, Body } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { User, AddUserDTO } from '../user/user.schema';
+import { User, AddUserDTO, UpdateUserDTO } from '../user/user.schema';
 
 @Controller()
 export class UserController {
@@ -24,6 +24,17 @@ export class UserController {
       .then(addedUser => res.json(addedUser))
       .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
           code: 'createError',
+          error: err
+        })
+      );
+  }
+
+  @Patch('/user/:user_id')
+  async Update( @Param('user_id') user_id, @Body() updateUserDTO:UpdateUserDTO, @Res() res) {
+      return await this.userService.UpdateUser(user_id, updateUserDTO)
+      .then(updatedUser => res.json(updatedUser))
+      .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
+          code: 'updateError',
           error: err
         })
       );
