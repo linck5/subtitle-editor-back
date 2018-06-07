@@ -31,7 +31,7 @@ export class UserService {
       return await NewUser.save();
     }
 
-    async AddUser(user: AddUserDTO): Promise<User> {
+    async Create(user: AddUserDTO): Promise<User> {
       const NewUser = new this.userModel({
         username: user.username,
         password: hashSync(user.password, genSaltSync(10)),
@@ -41,15 +41,19 @@ export class UserService {
       return await NewUser.save();
     }
 
-    async UpdateUser(id, user: UpdateUserDTO): Promise<User> {
+    async Update(id, user: UpdateUserDTO): Promise<User> {
       return await this.userModel.findByIdAndUpdate(id, user, {new: true});
+    }
+
+    async Delete(id): Promise<User> {
+      return await this.userModel.findByIdAndRemove(id);
     }
 
     async GetById(id): Promise<User> {
       return await this.userModel.findById(id);
     }
 
-    async FindUser(user: User): Promise<User> {
+    async Find(user: User): Promise<User> {
       return await this.userModel.findOne({ username: user.username });
     }
 }

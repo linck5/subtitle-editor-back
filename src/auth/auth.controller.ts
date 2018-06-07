@@ -11,7 +11,7 @@ export class AuthController {
     @Post('/authenticate')
     async CreateToken( @Body() reqBody: User, @Res() res) {
 
-        return await this.userService.FindUser(reqBody).then(user => {
+        return await this.userService.Find(reqBody).then(user => {
 
             if (!user || !compareSync(reqBody.password, user.password)) {
               res.status(HttpStatus.BAD_REQUEST).json({
