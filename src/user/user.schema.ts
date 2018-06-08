@@ -41,7 +41,7 @@ export const UserSchema = new Schema({
   //branches: Branch[],
   creation: {
     type: Date,
-    defaultsTo: Date.now()
+    default: Date.now()
   },
   lastOnline: {
     type: Date
