@@ -1,3 +1,4 @@
+/// <reference types="mongoose" />
 
 declare module 'mongoose' {
 
@@ -10,7 +11,8 @@ declare module 'mongoose' {
     startingAfter?: string;
     endingBefore?: string;
     limit?: number;
-    sort?: Object
+    sort?: Object;
+    key?: string;
   }
 
   interface PaginateModel<T extends Document> extends Model<T> {
