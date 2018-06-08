@@ -1,10 +1,10 @@
 import { sign } from 'jsonwebtoken';
-import { Component, Inject } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { promise } from 'selenium-webdriver';
 import { User } from '../user/user.schema';
 
 
-@Component()
+@Injectable()
 // tslint:disable-next-line:component-class-suffix
 export class AuthService {
     constructor() { }

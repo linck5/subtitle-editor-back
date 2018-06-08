@@ -10,13 +10,13 @@
     "start": "nodemon --watch ./src --exec ts-node ./index.ts"
   },
   "dependencies": {
-    "@angular/core": "^5.2.10",
-    "@nestjs/common": "^4.6.6",
-    "@nestjs/core": "^4.6.6",
-    "@nestjs/microservices": "^4.6.6",
-    "@nestjs/mongoose": "^3.0.1",
-    "@nestjs/testing": "^4.6.6",
-    "@nestjs/websockets": "^4.6.6",
+    "@angular/core": "^6.0.4",
+    "@nestjs/common": "^5.0.1",
+    "@nestjs/core": "^5.0.1",
+    "@nestjs/microservices": "^5.0.1",
+    "@nestjs/mongoose": "^5.0.0",
+    "@nestjs/testing": "^5.0.1",
+    "@nestjs/websockets": "^5.0.1",
     "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
@@ -30,7 +30,7 @@
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.1",
     "reflect-metadata": "^0.1.12",
-    "rxjs": "^5.5.10",
+    "rxjs": "^6.2.0",
     "zone.js": "^0.8.14"
   },
   "devDependencies": {

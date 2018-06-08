@@ -1,17 +1,17 @@
 import { Model, Error, PaginateModel, PaginateResult } from 'mongoose';
-import { Component, Inject, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { UserSchema, User, AddUserDTO, UpdateUserDTO } from './user.schema';
 import { SecretKeysComponent } from '../common/secretKeys.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { genSaltSync, hashSync } from 'bcrypt';
 
-@Component()
+@Injectable()
 // tslint:disable-next-line:component-class-suffix
 export class UserService {
 
     constructor(
-      @InjectModel(UserSchema) private readonly userModel: Model<User>,
-      @InjectModel(UserSchema) private readonly paginateUserModel: PaginateModel<User>
+      @InjectModel('User') private readonly userModel: Model<User>,
+      @InjectModel('User') private readonly paginateUserModel: PaginateModel<User>
     ) { }
 
     onModuleInit() {

@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
-import { Component, Inject } from '@nestjs/common';
-@Component()
+import { Injectable, Inject } from '@nestjs/common';
+@Injectable()
 export class MessageSenderService {
 
     getMessage(): String {

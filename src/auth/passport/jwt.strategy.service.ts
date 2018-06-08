@@ -1,10 +1,10 @@
 import * as passport from 'passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Component, Inject } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { async } from '@angular/core/testing';
 import { AuthService } from '../auth.service';
 
-@Component()
+@Injectable()
 // tslint:disable-next-line:component-class-suffix
 export class JwtStrategy extends Strategy {
     constructor(private authService: AuthService) {
