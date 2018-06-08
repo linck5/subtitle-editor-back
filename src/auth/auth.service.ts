@@ -14,7 +14,7 @@ export class AuthService {
     public createToken(user: User): any {
       const expiresIn = '48h'
       const secretOrKey = process.env.JWT_SWECRET;
-      const Payload = { username: user.username, admin: user.admin };
+      const Payload = { username: user.username, roles: user.roles };
       const token = sign(Payload, secretOrKey, { expiresIn });
       return {
         message: 'Success',
