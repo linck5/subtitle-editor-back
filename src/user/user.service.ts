@@ -1,4 +1,4 @@
-import { Model, Error } from 'mongoose';
+import { Model, Error, PaginateModel, PaginateResult } from 'mongoose';
 import { Component, Inject, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { UserSchema, User, AddUserDTO, UpdateUserDTO } from './user.schema';
 import { SecretKeysComponent } from '../common/secretKeys.service';
@@ -9,7 +9,10 @@ import { genSaltSync, hashSync } from 'bcrypt';
 // tslint:disable-next-line:component-class-suffix
 export class UserService {
 
-    constructor( @InjectModel(UserSchema) private readonly userModel: Model<User>) { }
+    constructor(
+      @InjectModel(UserSchema) private readonly userModel: Model<User>,
+      @InjectModel(UserSchema) private readonly paginateUserModel: PaginateModel<User>
+    ) { }
 
     onModuleInit() {
       // setTimeout(()=>{
@@ -51,6 +54,15 @@ export class UserService {
 
     async GetById(id): Promise<User> {
       return await this.userModel.findById(id);
+    }
+
+    async List(): Promise<PaginateResult<User>> {
+      return await this.paginateUserModel.paginate({}, {
+        sort: { '_id': -1 },
+        //startingAfter: '5b19c1635bc38f4ba0f4b8c9',
+        limit: 3
+      });
+
     }
 
     async Find(user: User): Promise<User> {

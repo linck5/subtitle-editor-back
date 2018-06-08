@@ -7,6 +7,20 @@ export class UserController {
   constructor(private readonly userService: UserService) { }
 
 
+  @Get('/users')
+  async List( @Res() res) {
+      return await this.userService.List()
+      .then(users => res.json(users))
+      .catch(err => {
+          console.log(err)
+          res.status(HttpStatus.BAD_REQUEST).json({
+            code: 'tmp',
+            err: err
+          })
+        }
+      );
+  }
+
   @Get('/user/:user_id')
   async GetById( @Param('user_id') user_id, @Res() res) {
       return await this.userService.GetById(user_id)

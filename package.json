@@ -1,9 +1,9 @@
 {
   "name": "MelonSubSyncerBackEnd",
   "version": "0.0.3",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://bitbucket.org/larss100/mss-back"
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/larss100/mss-back"
   },
   "license": "MIT",
   "scripts": {
@@ -26,6 +26,7 @@
     "jsonwebtoken": "^8.1.0",
     "mongodb": "^2.2.26",
     "mongoose": "^5.0.16",
+    "mongoose-cursor-pagination": "^1.0.1",
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.1",
     "reflect-metadata": "^0.1.12",

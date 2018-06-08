@@ -1,4 +1,6 @@
 import { Document, Schema } from 'mongoose';
+import paginationPlugin from 'mongoose-cursor-pagination'
+
 
 
 export class AddUserDTO {
@@ -53,3 +55,5 @@ export const UserSchema = new Schema({
     type: Boolean
   }
 });
+
+UserSchema.plugin(paginationPlugin);
