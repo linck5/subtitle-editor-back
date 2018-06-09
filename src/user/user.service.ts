@@ -56,11 +56,23 @@ export class UserService {
       return await this.userModel.findById(id);
     }
 
-    async List(): Promise<PaginateResult<User>> {
+
+    async List(
+      limit?:number,
+      orderBy?:{field:string, desc:boolean}[],
+      startingAfter?:string,
+      endingBefore?:string //one of the two only
+    ): Promise<PaginateResult<User>> {
+
+      const sort:Object = {};
+      orderBy.map(obj => sort[obj.field] = obj.desc? -1:1);
+
       return await this.paginateUserModel.paginate({}, {
-        sort: { '_id': -1 },
-        //startingAfter: '5b19c1635bc38f4ba0f4b8c9',
-        limit: 3
+        key: orderBy.length > 0? orderBy[0].field : undefined,
+        sort: sort,
+        startingAfter: startingAfter,
+        endingBefore: endingBefore,
+        limit: limit
       });
 
     }

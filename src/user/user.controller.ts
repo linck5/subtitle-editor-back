@@ -1,68 +1,78 @@
-import { Controller, Post, HttpCode, HttpStatus, Param, Res, Req, Get, Patch, Body, Delete } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, Param, Query, Res, Req, Get,
+  Patch, Body, Delete, HttpException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { User, AddUserDTO, UpdateUserDTO } from '../user/user.schema';
+import { OrderByFormatValidationPipe } from '../common/orderby.pipe'
+
+
+class ListQuery {
+  readonly limit: number;
+  readonly orderBy: string;
+  readonly startingAfter: string;
+  readonly endingBefore: string;
+}
 
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
 
+
   @Get('/users')
-  async List( @Res() res) {
-      return await this.userService.List()
-      .then(users => res.json(users))
-      .catch(err => {
-          console.log(err)
-          res.status(HttpStatus.BAD_REQUEST).json({
-            code: 'tmp',
-            err: err
-          })
-        }
-      );
+  async List( @Query(new OrderByFormatValidationPipe()) query:ListQuery) {
+
+    return await this.userService.List(80, [{field: 'roles', desc: false}])
+    .catch(err => {
+        throw new HttpException({
+          code: 'tmp',
+          err: err
+        }, HttpStatus.BAD_REQUEST);
+      }
+    );
   }
 
   @Get('/user/:user_id')
   async GetById( @Param('user_id') user_id, @Res() res) {
-      return await this.userService.GetById(user_id)
-      .then(user => res.json(user))
-      .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
-          code: 'noSuchId',
-          message: 'User id not found'
-        })
-      );
+    return await this.userService.GetById(user_id)
+    .then(user => res.json(user))
+    .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
+        code: 'noSuchId',
+        message: 'User id not found'
+      })
+    );
   }
 
   @Post('/users')
   async Create( @Body() addUserDTO:AddUserDTO, @Res() res) {
-      return await this.userService.Create(addUserDTO)
-      .then(addedUser => res.json(addedUser))
-      .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
-          code: 'createError',
-          error: err
-        })
-      );
+    return await this.userService.Create(addUserDTO)
+    .then(addedUser => res.json(addedUser))
+    .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
+        code: 'createError',
+        error: err
+      })
+    );
   }
 
   @Patch('/user/:user_id')
   async Update( @Param('user_id') user_id, @Body() updateUserDTO:UpdateUserDTO, @Res() res) {
-      return await this.userService.Update(user_id, updateUserDTO)
-      .then(updatedUser => res.json(updatedUser))
-      .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
-          code: 'updateError',
-          error: err
-        })
-      );
+    return await this.userService.Update(user_id, updateUserDTO)
+    .then(updatedUser => res.json(updatedUser))
+    .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
+        code: 'updateError',
+        error: err
+      })
+    );
   }
 
   @Delete('/user/:user_id')
   async Delete( @Param('user_id') user_id, @Res() res) {
-      return await this.userService.Delete(user_id)
-      .then(user => res.json(user))
-      .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
-          code: 'noSuchId',
-          message: 'User id not found'
-        })
-      );
+    return await this.userService.Delete(user_id)
+    .then(user => res.json(user))
+    .catch(err => res.status(HttpStatus.BAD_REQUEST).json({
+        code: 'noSuchId',
+        message: 'User id not found'
+      })
+    );
   }
 
 }
