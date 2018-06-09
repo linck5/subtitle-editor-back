@@ -1,29 +1,37 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Res, Req, Get } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, HttpException, Body, Res, Req,
+  Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { User } from '../user/user.schema';
+import { User, AuthUserDTO } from '../user/user.schema';
 import { UserService } from '../user/user.service';
 import { compareSync } from 'bcrypt';
+
+
 
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService, private readonly userService: UserService) { }
 
+
+
     @Post('/authenticate')
-    async CreateToken( @Body() reqBody: User, @Res() res) {
+    async CreateToken( @Body() authUserDTO: AuthUserDTO) {
+        const user = await this.userService.FindByName(authUserDTO.username)
+        .catch(err => {
+            throw new HttpException({
+              code: 'noSuchId',
+              message: 'User id not found'
+            }, HttpStatus.BAD_REQUEST);
+          }
+        );
 
-        return await this.userService.Find(reqBody).then(user => {
+        if (!user || !compareSync(authUserDTO.password, user.password)) {
+          throw new HttpException({
+            code: 'authDenied',
+            message: 'User not found or password does not match'
+          }, HttpStatus.BAD_REQUEST);
+        }
 
-            if (!user || !compareSync(reqBody.password, user.password)) {
-              res.status(HttpStatus.BAD_REQUEST).json({
-                code: 'authDenied',
-                message: 'User not found or password does not match'
-              });
-            }
-            else {
-              return res.json(
-                this.authService.createToken(user)
-              );
-            }
-        });
+        else return this.authService.createToken(user);
+
     }
 }

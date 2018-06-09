@@ -1,16 +1,10 @@
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException,
 HttpException, HttpStatus } from '@nestjs/common';
-
-class ListQuery {
-  readonly limit: number;
-  readonly orderBy: string;
-  readonly startingAfter: string;
-  readonly endingBefore: string;
-}
+import { ListUserDTO } from '../user/user.schema'
 
 @Injectable()
 export class OrderByFormatValidationPipe implements PipeTransform {
-  transform(query: ListQuery, metadata: ArgumentMetadata) {
+  transform(query: ListUserDTO, metadata: ArgumentMetadata) {
 
     if(query.orderBy){
       query.orderBy.trim().split(/\s*,\s*/).map(orderByParam => {

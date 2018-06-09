@@ -77,7 +77,7 @@ export class UserService {
 
     }
 
-    async Find(user: User): Promise<User> {
-      return await this.userModel.findOne({ username: user.username });
+    async FindByName(username: string): Promise<User> {
+      return await this.userModel.findOne({ username: username });
     }
 }

@@ -3,19 +3,6 @@ import paginationPlugin from 'mongoose-cursor-pagination'
 
 
 
-export class AddUserDTO {
-  readonly username: string;
-  readonly password: string;
-  readonly roles: string[];
-  readonly active: boolean;
-}
-
-export class UpdateUserDTO {
-  readonly roles: string[];
-  readonly lastOnline: Date;
-  readonly banned: boolean;
-  readonly active: boolean;
-}
 
 export interface User extends Document {
   username: string,
@@ -55,5 +42,30 @@ export const UserSchema = new Schema({
     type: Boolean
   }
 });
-
 UserSchema.plugin(paginationPlugin);
+
+export class AuthUserDTO {
+  readonly username: string;
+  readonly password: string;
+}
+
+export class AddUserDTO {
+  readonly username: string;
+  readonly password: string;
+  readonly roles: string[];
+  readonly active: boolean;
+}
+
+export class UpdateUserDTO {
+  readonly roles: string[];
+  readonly lastOnline: Date;
+  readonly banned: boolean;
+  readonly active: boolean;
+}
+
+export class ListUserDTO {
+  readonly limit: number;
+  readonly orderBy: string;
+  readonly startingAfter: string;
+  readonly endingBefore: string;
+}
