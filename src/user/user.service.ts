@@ -1,9 +1,10 @@
-import { Model, Error, PaginateModel, PaginateResult } from 'mongoose';
+import { Model, Error, PaginateModel, PaginateResult, PaginateOptions } from 'mongoose';
 import { Injectable, Inject, BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { UserSchema, User, AddUserDTO, UpdateUserDTO } from './user.schema';
+import { UserSchema, User, AddUserDTO, UpdateUserDTO, ListUserDTO } from './user.schema';
 import { SecretKeysComponent } from '../common/secretKeys.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { genSaltSync, hashSync } from 'bcrypt';
+import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 
 @Injectable()
 // tslint:disable-next-line:component-class-suffix
@@ -57,23 +58,32 @@ export class UserService {
     }
 
 
-    async List(
-      limit?:number,
-      orderBy?:{field:string, desc:boolean}[],
-      startingAfter?:string,
-      endingBefore?:string //one of the two only
-    ): Promise<PaginateResult<User>> {
+    async List(dto:ListUserDTO): Promise<PaginateResult<User>> {
 
-      const sort:Object = {};
-      orderBy.map(obj => sort[obj.field] = obj.desc? -1:1);
 
-      return await this.paginateUserModel.paginate({}, {
-        key: orderBy.length > 0? orderBy[0].field : undefined,
-        sort: sort,
-        startingAfter: startingAfter,
-        endingBefore: endingBefore,
-        limit: limit
-      });
+      let options:PaginateOptions = {
+        sort: {}
+      };
+
+
+
+      //the pagination library won't work assigning undefined to
+      //PaginateOptions feilds, so conditionally assign them:
+      if(dto.limit) options.limit = dto.limit;
+      if(dto.offset) options.offset = dto.offset;
+      if(dto.page) options.page = dto.page;
+      if(dto.orderBy && dto.orderBy.length > 0){
+        dto.orderBy.map(orderByParam => {
+          options.sort[orderByParam.field] = orderByParam.desc? -1:1
+        });
+      };
+
+      //TODO move this somewhere else
+      if(options.limit) options.limit = +options.limit;
+      if(options.offset) options.offset = +options.offset;
+      if(options.page) options.page = +options.page;
+
+      return await this.paginateUserModel.paginate({}, options);
 
     }
 

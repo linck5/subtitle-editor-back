@@ -1,8 +1,12 @@
 # General
 
 ### Pagination
-All the "List" calls use a cursor-based pagination like this one:
-https://stripe.com/docs/api/curl#pagination
+All the "List" calls accept a `limit` param, together with `page` OR `offset` params.
+
+`GET /users?limit=10&page=3`
+will return the same docs as:
+`GET /users?limit=10&offset=20`
+
 
 ### OrderBy parameters
 `orderby` parameters accept a comma-separated list of sort keys. Each key sorts ascending by default, but may be reversed with the `desc` modifier, separated from the key with a space. Example usage for listing users:

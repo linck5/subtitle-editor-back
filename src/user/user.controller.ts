@@ -2,21 +2,23 @@ import { Controller, Post, HttpCode, HttpStatus, Param, Query, Res, Req, Get,
   Patch, Body, Delete, HttpException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { User, AddUserDTO, UpdateUserDTO, ListUserDTO } from '../user/user.schema';
-import { OrderByFormatValidationPipe } from '../common/orderby.pipe'
-
-
-
+import { OrderByFormatValidationPipe } from '../common/orderBy/orderByStringFormatValidation.pipe'
+import { OrderByStringConverterPipe } from '../common/orderBy/orderByStringConverter.pipe'
 
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
 
-
   @Get('/users')
-  async List( @Query(new OrderByFormatValidationPipe()) query:ListUserDTO) {
-
-    return await this.userService.List(80, [{field: 'roles', desc: false}])
+  async List(
+     @Query(
+       new OrderByFormatValidationPipe(),
+       new OrderByStringConverterPipe()
+     ) query:ListUserDTO
+   ) {
+    console.log(query.orderBy)
+    return await this.userService.List(query)
     .catch(err => {
         throw new HttpException({
           code: 'tmp',

@@ -1,10 +1,9 @@
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException,
 HttpException, HttpStatus } from '@nestjs/common';
-import { ListUserDTO } from '../user/user.schema'
 
 @Injectable()
 export class OrderByFormatValidationPipe implements PipeTransform {
-  transform(query: ListUserDTO, metadata: ArgumentMetadata) {
+  transform(query: any, metadata: ArgumentMetadata) {
 
     if(query.orderBy){
       query.orderBy.trim().split(/\s*,\s*/).map(orderByParam => {

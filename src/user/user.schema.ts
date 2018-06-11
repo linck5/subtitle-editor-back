@@ -1,7 +1,5 @@
 import { Document, Schema } from 'mongoose';
-import paginationPlugin from 'mongoose-cursor-pagination'
-
-
+var mongoosePaginate = require('mongoose-paginate');
 
 
 export interface User extends Document {
@@ -18,7 +16,8 @@ export interface User extends Document {
 export const UserSchema = new Schema({
   username: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   password: {
     type: String,
@@ -42,7 +41,7 @@ export const UserSchema = new Schema({
     type: Boolean
   }
 });
-UserSchema.plugin(paginationPlugin);
+UserSchema.plugin(mongoosePaginate);
 
 export class AuthUserDTO {
   readonly username: string;
@@ -63,9 +62,10 @@ export class UpdateUserDTO {
   readonly active: boolean;
 }
 
+import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 export class ListUserDTO {
   readonly limit: number;
-  readonly orderBy: string;
-  readonly startingAfter: string;
-  readonly endingBefore: string;
+  readonly orderBy: OrderByParam[];
+  readonly offset: number;
+  readonly page: number;
 }
