@@ -1,9 +1,11 @@
 import { Controller, Post, HttpCode, HttpStatus, Param, Query, Res, Req, Get,
   Patch, Body, Delete, HttpException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { User, AddUserDTO, UpdateUserDTO, ListUserDTO } from '../user/user.schema';
+import { User } from './user.schema';
+import { AddUserDTO, UpdateUserDTO, ListUserDTO } from './user.dtos';
 import { OrderByFormatValidationPipe } from '../common/orderBy/orderByStringFormatValidation.pipe'
 import { OrderByStringConverterPipe } from '../common/orderBy/orderByStringConverter.pipe'
+
 
 @Controller()
 export class UserController {
@@ -17,7 +19,6 @@ export class UserController {
        new OrderByStringConverterPipe()
      ) query:ListUserDTO
    ) {
-    console.log(query.orderBy)
     return await this.userService.List(query)
     .catch(err => {
         throw new HttpException({

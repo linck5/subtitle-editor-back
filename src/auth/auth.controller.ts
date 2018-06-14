@@ -1,7 +1,8 @@
 import { Controller, Post, HttpCode, HttpStatus, HttpException, Body, Res, Req,
   Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { User, AuthUserDTO } from '../user/user.schema';
+import { User } from '../user/user.schema';
+import { AuthUserDTO } from '../user/user.dtos';
 import { UserService } from '../user/user.service';
 import { compareSync } from 'bcrypt';
 

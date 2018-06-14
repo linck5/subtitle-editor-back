@@ -1,10 +1,11 @@
-import { Model, Error, PaginateModel, PaginateResult, PaginateOptions } from 'mongoose';
-import { Injectable, Inject, BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { UserSchema, User, AddUserDTO, UpdateUserDTO, ListUserDTO } from './user.schema';
-import { SecretKeysComponent } from '../common/secretKeys.service';
+import { Model, PaginateModel, PaginateResult, PaginateOptions,
+  ModelFindByIdAndUpdateOptions } from 'mongoose';
+import { Injectable } from '@nestjs/common';
+import { User } from './user.schema';
+import { AddUserDTO, UpdateUserDTO, ListUserDTO } from './user.dtos';
 import { InjectModel } from '@nestjs/mongoose';
 import { genSaltSync, hashSync } from 'bcrypt';
-import { OrderByParam } from '../common/orderBy/orderByParamFormat';
+
 
 @Injectable()
 // tslint:disable-next-line:component-class-suffix
@@ -15,24 +16,10 @@ export class UserService {
       @InjectModel('User') private readonly paginateUserModel: PaginateModel<User>
     ) { }
 
-    onModuleInit() {
-      // setTimeout(()=>{
-      //   this.addUserTest();
-      // },2000)
-    }
+    onModuleInit() { }
 
     async FindAll(): Promise<User[]> {
       return await this.userModel.find();
-    }
-
-    async addUserTest(): Promise<User> {
-      const NewUser= new this.userModel({
-        username: "testUser",
-        password: hashSync("password", genSaltSync(10)),
-        roles: ["ADMIN", "MODERATOR"],
-        active: true
-      });
-      return await NewUser.save();
     }
 
     async Create(user: AddUserDTO): Promise<User> {
@@ -46,7 +33,11 @@ export class UserService {
     }
 
     async Update(id, user: UpdateUserDTO): Promise<User> {
-      return await this.userModel.findByIdAndUpdate(id, user, {new: true});
+      const options:ModelFindByIdAndUpdateOptions = {
+        new: true, // true to return the modified document rather than the original
+        runValidators: true
+      }
+      return await this.userModel.findByIdAndUpdate(id, user, options);
     }
 
     async Delete(id): Promise<User> {
@@ -60,12 +51,9 @@ export class UserService {
 
     async List(dto:ListUserDTO): Promise<PaginateResult<User>> {
 
-
       let options:PaginateOptions = {
         sort: {}
       };
-
-
 
       //the pagination library won't work assigning undefined to
       //PaginateOptions feilds, so conditionally assign them:
@@ -77,11 +65,6 @@ export class UserService {
           options.sort[orderByParam.field] = orderByParam.desc? -1:1
         });
       };
-
-      //TODO move this somewhere else
-      if(options.limit) options.limit = +options.limit;
-      if(options.offset) options.offset = +options.offset;
-      if(options.page) options.page = +options.page;
 
       return await this.paginateUserModel.paginate({}, options);
 

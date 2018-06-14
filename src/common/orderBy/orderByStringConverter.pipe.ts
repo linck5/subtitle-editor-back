@@ -4,7 +4,7 @@ import { OrderByParam } from './orderByParamFormat';
 
 @Injectable()
 export class OrderByStringConverterPipe implements PipeTransform {
-  transform(query: any, metadata: ArgumentMetadata) {
+  transform(query: any) {
 
     if(query.orderBy){
       query.orderBy = query.orderBy

@@ -1,7 +1,6 @@
 import { Document, Schema } from 'mongoose';
 var mongoosePaginate = require('mongoose-paginate');
 
-
 export interface User extends Document {
   username: string,
   password: string,
@@ -24,7 +23,7 @@ export const UserSchema = new Schema({
     required: true
   },
   roles: {
-    type: [{ type: String, enum: ['ADMIN', 'MODERATOR'] }]
+    type: [{ type: String, enum: ['ADMIN', 'MODERATOR']}]
   },
   //branches: Branch[],
   creation: {
@@ -42,30 +41,3 @@ export const UserSchema = new Schema({
   }
 });
 UserSchema.plugin(mongoosePaginate);
-
-export class AuthUserDTO {
-  readonly username: string;
-  readonly password: string;
-}
-
-export class AddUserDTO {
-  readonly username: string;
-  readonly password: string;
-  readonly roles: string[];
-  readonly active: boolean;
-}
-
-export class UpdateUserDTO {
-  readonly roles: string[];
-  readonly lastOnline: Date;
-  readonly banned: boolean;
-  readonly active: boolean;
-}
-
-import { OrderByParam } from '../common/orderBy/orderByParamFormat';
-export class ListUserDTO {
-  readonly limit: number;
-  readonly orderBy: OrderByParam[];
-  readonly offset: number;
-  readonly page: number;
-}

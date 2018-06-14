@@ -8,6 +8,9 @@ import * as path from 'path';
 import { ApplicationModule } from './src/app.module';
 import * as cors from 'cors';
 import * as expressJWT from 'express-jwt';
+import { DTOValidationPipe } from './src/common/dtoValidation.pipe';
+import { NumberParserPipe } from './src/common/parsers/numberParser.pipe';
+import { BooleanParserPipe } from './src/common/parsers/booleanParser.pipe';
 
 
 
@@ -29,6 +32,12 @@ async function bootstrap() {
             });
         }
     });
+
+    app.useGlobalPipes(
+      new NumberParserPipe(),
+      new BooleanParserPipe(),
+      new DTOValidationPipe()
+    );
     await app.listen(process.env.PORT, () => {
         console.log('MSS is listening on port ' + process.env.PORT);
     });

@@ -1,9 +1,9 @@
-import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException,
-HttpException, HttpStatus } from '@nestjs/common';
+import { PipeTransform, Injectable, ArgumentMetadata, HttpException,
+  HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class OrderByFormatValidationPipe implements PipeTransform {
-  transform(query: any, metadata: ArgumentMetadata) {
+  transform(query: any) {
 
     if(query.orderBy){
       query.orderBy.trim().split(/\s*,\s*/).map(orderByParam => {
