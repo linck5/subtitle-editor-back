@@ -16,20 +16,12 @@ export class AuthController {
 
     @Post('/authenticate')
     async CreateToken( @Body() authUserDTO: AuthUserDTO) {
-        const user = await this.userService.FindByName(authUserDTO.username)
-        .catch(err => {
-            throw new HttpException({
-              code: 'noSuchId',
-              message: 'User id not found'
-            }, HttpStatus.BAD_REQUEST);
-          }
-        );
+        const user = await this.userService.FindByName(authUserDTO.username);
 
         if (!user || !compareSync(authUserDTO.password, user.password)) {
-          throw new HttpException({
-            code: 'authDenied',
-            message: 'User not found or password does not match'
-          }, HttpStatus.BAD_REQUEST);
+          throw new HttpException(
+            'User not found or password does not match'
+          , HttpStatus.FORBIDDEN);
         }
 
         else return this.authService.createToken(user);

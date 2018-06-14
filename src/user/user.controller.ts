@@ -21,60 +21,50 @@ export class UserController {
    ) {
     return await this.userService.List(query)
     .catch(err => {
-        throw new HttpException({
-          code: 'tmp',
-          err: err
-        }, HttpStatus.BAD_REQUEST);
-      }
-    );
+      throw new HttpException({
+        error: err
+      }, HttpStatus.BAD_REQUEST);
+    });
   }
 
   @Get('/user/:user_id')
   async GetById( @Param('user_id') user_id) {
     return await this.userService.GetById(user_id)
     .catch(err => {
-        throw new HttpException({
-          code: 'noSuchId',
-          message: 'User id not found'
-        }, HttpStatus.BAD_REQUEST);
-      }
-    );
+      throw new HttpException({
+        error: err
+      }, HttpStatus.BAD_REQUEST);
+    });
   }
 
   @Post('/users')
   async Create( @Body() addUserDTO:AddUserDTO) {
     return await this.userService.Create(addUserDTO)
     .catch(err => {
-        throw new HttpException({
-          code: 'createError',
-          error: err
-        }, HttpStatus.BAD_REQUEST);
-      }
-    );
+      throw new HttpException({
+        error: err
+      }, HttpStatus.BAD_REQUEST);
+    });
   }
 
   @Patch('/user/:user_id')
   async Update( @Param('user_id') user_id, @Body() updateUserDTO:UpdateUserDTO) {
     return await this.userService.Update(user_id, updateUserDTO)
     .catch(err => {
-        throw new HttpException({
-          code: 'updateError',
-          error: err
-        }, HttpStatus.BAD_REQUEST);
-      }
-    );
+      throw new HttpException({
+        error: err
+      }, HttpStatus.BAD_REQUEST);
+    });
   }
 
   @Delete('/user/:user_id')
   async Delete( @Param('user_id') user_id) {
     return await this.userService.Delete(user_id)
     .catch(err => {
-        throw new HttpException({
-          code: 'noSuchId',
-          message: 'User id not found'
-        }, HttpStatus.BAD_REQUEST);
-      }
-    );
+      throw new HttpException({
+        error: err
+      }, HttpStatus.BAD_REQUEST);
+    });
   }
 
 }
