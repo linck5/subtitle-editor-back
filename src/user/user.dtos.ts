@@ -58,3 +58,6 @@ export class ListUserDTO {
   @IsInt()
   readonly page: number;
 }
+
+export const userOrderByParams =
+['username', 'creation', /*'branchCount',*/ 'lastOnline']

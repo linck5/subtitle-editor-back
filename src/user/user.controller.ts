@@ -1,7 +1,7 @@
 import { Controller, Post, HttpCode, HttpStatus, Param, Query, Res, Req, Get,
   Patch, Body, Delete, HttpException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { User } from './user.schema';
+import { userOrderByParams } from './user.dtos';
 import { AddUserDTO, UpdateUserDTO, ListUserDTO } from './user.dtos';
 import { OrderByFormatValidationPipe } from '../common/orderBy/orderByStringFormatValidation.pipe'
 import { OrderByStringConverterPipe } from '../common/orderBy/orderByStringConverter.pipe'
@@ -15,7 +15,7 @@ export class UserController {
   @Get('/users')
   async List(
      @Query(
-       new OrderByFormatValidationPipe(),
+       new OrderByFormatValidationPipe(userOrderByParams),
        new OrderByStringConverterPipe()
      ) query:ListUserDTO
    ) {

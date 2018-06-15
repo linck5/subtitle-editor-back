@@ -52,7 +52,7 @@ Name|Type|Notes
 --- | --- | ---
 active | boolean | default: true
 banned | boolean | default: true
-orderby | string | valid keys: name, creation, branchCount, lastOnline
+orderby | string | valid keys: username, creation, branchCount, lastOnline
 
 
 ### Get one user
