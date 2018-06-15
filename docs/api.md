@@ -116,6 +116,7 @@ orderby | string | valid keys: name, creation, subtitleTreeCount, duration
 ##### By id:
 `GET /video/:video_id`
 ##### By name:
+<!-- TODO do this next -->
 `GET /video`
 ##### Parameters:
 Name|Type|Notes
@@ -128,7 +129,9 @@ name | string
 ##### Input:
 Name|Type|Notes
 --- | --- | ---
-name | string
+name | string |
+description | string
+duration | string
 url | string
 
 
@@ -139,7 +142,10 @@ url | string
 Name|Type|Notes
 --- | --- | ---
 name | string | **required**
+description | string
+duration | string | **required**
 url | string
+
 
 ### Delete
 `DELETE /video/video_id`
