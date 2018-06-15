@@ -2,7 +2,7 @@ import { Model, PaginateModel, PaginateResult, PaginateOptions,
   ModelFindByIdAndUpdateOptions } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { User } from './user.schema';
-import { AddUserDTO, UpdateUserDTO, ListUserDTO } from './user.dtos';
+import { CreateUserDTO, UpdateUserDTO, ListUserDTO } from './user.dtos';
 import { InjectModel } from '@nestjs/mongoose';
 import { genSaltSync, hashSync } from 'bcrypt';
 
@@ -22,7 +22,7 @@ export class UserService {
       return await this.userModel.find();
     }
 
-    async Create(user: AddUserDTO): Promise<User> {
+    async Create(user: CreateUserDTO): Promise<User> {
       const NewUser = new this.userModel({
         username: user.username,
         password: hashSync(user.password, genSaltSync(10)),

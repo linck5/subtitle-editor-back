@@ -1,10 +1,9 @@
-import { Controller, Post, HttpCode, HttpStatus, Param, Query, Res, Req, Get,
-  Patch, Body, Delete, HttpException } from '@nestjs/common';
+import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body, Delete,
+  HttpException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { userOrderByParams } from './user.dtos';
-import { AddUserDTO, UpdateUserDTO, ListUserDTO } from './user.dtos';
-import { OrderByFormatValidationPipe } from '../common/orderBy/orderByStringFormatValidation.pipe'
-import { OrderByStringConverterPipe } from '../common/orderBy/orderByStringConverter.pipe'
+import { CreateUserDTO, UpdateUserDTO, ListUserDTO, userOrderByParams } from './user.dtos';
+import { OrderByFormatValidationPipe } from '../common/orderBy/orderByStringFormatValidation.pipe';
+import { OrderByStringConverterPipe } from '../common/orderBy/orderByStringConverter.pipe';
 
 
 @Controller()
@@ -38,7 +37,7 @@ export class UserController {
   }
 
   @Post('/users')
-  async Create( @Body() addUserDTO:AddUserDTO) {
+  async Create( @Body() addUserDTO:CreateUserDTO) {
     return await this.userService.Create(addUserDTO)
     .catch(err => {
       throw new HttpException({

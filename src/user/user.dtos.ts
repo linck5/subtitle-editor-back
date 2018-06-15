@@ -13,7 +13,7 @@ export class AuthUserDTO {
   readonly password: string;
 }
 
-export class AddUserDTO {
+export class CreateUserDTO {
 
   @IsString()
   readonly username: string;
