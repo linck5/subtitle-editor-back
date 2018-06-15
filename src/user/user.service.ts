@@ -51,6 +51,11 @@ export class UserService {
 
     async List(dto:ListUserDTO): Promise<PaginateResult<User>> {
 
+      let query:any = {};
+      if(dto.active != undefined) query.active = dto.active;
+      if(dto.banned != undefined) query.banned = dto.banned;
+
+
       let options:PaginateOptions = {
         sort: {}
       };
@@ -66,7 +71,7 @@ export class UserService {
         });
       };
 
-      return await this.paginateUserModel.paginate({}, options);
+      return await this.paginateUserModel.paginate(query, options);
 
     }
 

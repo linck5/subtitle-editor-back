@@ -46,6 +46,12 @@ export class UpdateUserDTO {
 
 export class ListUserDTO {
 
+  @IsBoolean()
+  readonly active: boolean;
+
+  @IsBoolean()
+  readonly banned: boolean;
+
   @IsInt()
   readonly limit: number;
 
