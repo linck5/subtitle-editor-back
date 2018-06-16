@@ -3,8 +3,7 @@ import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body, Delete,
 import { UserService } from '../user/user.service';
 import { CreateUserDTO, UpdateUserDTO, ListUserDTO, userOrderByParams,
 GetUserByNameDTO } from './user.dtos';
-import { OrderByFormatValidationPipe } from '../common/orderBy/orderByStringFormatValidation.pipe';
-import { OrderByStringConverterPipe } from '../common/orderBy/orderByStringConverter.pipe';
+import { getOrderByProcessingPipes } from '../common/orderBy/orderByPipes.pipe';
 
 
 @Controller()
@@ -13,12 +12,9 @@ export class UserController {
 
 
   @Get('/users')
-  async List(
-     @Query(
-       new OrderByFormatValidationPipe(userOrderByParams),
-       new OrderByStringConverterPipe()
-     ) query:ListUserDTO
-   ) {
+  async List( @Query(
+    ...getOrderByProcessingPipes(userOrderByParams)
+  ) query:ListUserDTO ) {
     return await this.userService.List(query)
     .catch(err => {
       throw new HttpException({
