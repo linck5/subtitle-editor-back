@@ -67,7 +67,7 @@ export class VideoService {
 
     }
 
-    async FindByName(videoname: string): Promise<Video> {
-      return await this.videoModel.findOne({ videoname: videoname });
+    async FindByName(video_name: string): Promise<Video> {
+      return await this.videoModel.findOne({ name: video_name });
     }
 }

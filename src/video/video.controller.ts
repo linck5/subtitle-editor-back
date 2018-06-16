@@ -1,7 +1,8 @@
 import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body, Delete,
   HttpException } from '@nestjs/common';
 import { VideoService } from './video.service';
-import { CreateVideoDTO, UpdateVideoDTO, ListVideoDTO, videoOrderByParams } from './video.dtos';
+import { CreateVideoDTO, UpdateVideoDTO, ListVideoDTO, videoOrderByParams,
+GetVideoByNameDTO } from './video.dtos';
 import { OrderByFormatValidationPipe } from '../common/orderBy/orderByStringFormatValidation.pipe';
 import { OrderByStringConverterPipe } from '../common/orderBy/orderByStringConverter.pipe';
 
@@ -28,6 +29,16 @@ export class VideoController {
   @Get('/video/:video_id')
   async GetById( @Param('video_id') video_id) {
     return await this.videoService.GetById(video_id)
+    .catch(err => {
+      throw new HttpException({
+        error: err
+      }, HttpStatus.BAD_REQUEST);
+    });
+  }
+
+  @Get('/video')
+  async GetByName( @Query() query:GetVideoByNameDTO) {
+    return await this.videoService.FindByName(query.name)
     .catch(err => {
       throw new HttpException({
         error: err

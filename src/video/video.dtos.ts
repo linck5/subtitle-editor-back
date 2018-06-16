@@ -4,6 +4,12 @@ import { IsString, IsInt, IsUrl, IsAscii, IsBoolean, IsDate
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 
 
+export class GetVideoByNameDTO {
+
+  @IsString()
+  readonly name: string;
+}
+
 export class CreateVideoDTO {
 
   @IsString()

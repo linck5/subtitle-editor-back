@@ -1,7 +1,8 @@
 import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body, Delete,
   HttpException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { CreateUserDTO, UpdateUserDTO, ListUserDTO, userOrderByParams } from './user.dtos';
+import { CreateUserDTO, UpdateUserDTO, ListUserDTO, userOrderByParams,
+GetUserByNameDTO } from './user.dtos';
 import { OrderByFormatValidationPipe } from '../common/orderBy/orderByStringFormatValidation.pipe';
 import { OrderByStringConverterPipe } from '../common/orderBy/orderByStringConverter.pipe';
 
@@ -29,6 +30,16 @@ export class UserController {
   @Get('/user/:user_id')
   async GetById( @Param('user_id') user_id) {
     return await this.userService.GetById(user_id)
+    .catch(err => {
+      throw new HttpException({
+        error: err
+      }, HttpStatus.BAD_REQUEST);
+    });
+  }
+
+  @Get('/user')
+  async GetByName( @Query() query:GetUserByNameDTO) {
+    return await this.userService.FindByName(query.username)
     .catch(err => {
       throw new HttpException({
         error: err

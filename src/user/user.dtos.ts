@@ -13,6 +13,12 @@ export class AuthUserDTO {
   readonly password: string;
 }
 
+export class GetUserByNameDTO {
+
+  @IsString()
+  readonly username: string;
+}
+
 export class CreateUserDTO {
 
   @IsString()

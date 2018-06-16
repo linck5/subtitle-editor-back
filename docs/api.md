@@ -116,7 +116,6 @@ orderby | string | valid keys: name, creation, subtitleTreeCount, duration
 ##### By id:
 `GET /video/:video_id`
 ##### By name:
-<!-- TODO do this next -->
 `GET /video`
 ##### Parameters:
 Name|Type|Notes
