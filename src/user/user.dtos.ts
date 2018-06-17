@@ -41,7 +41,7 @@ export class UpdateUserDTO {
   readonly roles: string[];
 
   @IsDate()
-  readonly lastOnline: Date;
+  readonly lastonline: Date;
 
   @IsBoolean()
   readonly banned: boolean;
@@ -62,7 +62,7 @@ export class ListUserDTO {
   readonly limit: number;
 
   @IsString()
-  readonly orderBy: OrderByParam[];
+  readonly orderby: OrderByParam[];
 
   @IsInt()
   readonly offset: number;
@@ -72,4 +72,4 @@ export class ListUserDTO {
 }
 
 export const userOrderByParams =
-['username', 'creation', /*'branchCount',*/ 'lastOnline']
+['username', 'creation', /*'branchCount',*/ 'lastonline']

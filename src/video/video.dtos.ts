@@ -48,7 +48,7 @@ export class ListVideoDTO {
   readonly limit: number;
 
   @IsString()
-  readonly orderBy: OrderByParam[];
+  readonly orderby: OrderByParam[];
 
   @IsInt()
   readonly offset: number;

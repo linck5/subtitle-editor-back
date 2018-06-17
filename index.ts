@@ -11,6 +11,7 @@ import * as expressJWT from 'express-jwt';
 import { DTOValidationPipe } from './src/common/dtoValidation.pipe';
 import { NumberParserPipe } from './src/common/parsers/numberParser.pipe';
 import { BooleanParserPipe } from './src/common/parsers/booleanParser.pipe';
+import { LowercaseReqKeysPipe } from './src/common/lowercaseReqKeys.pipe';
 
 
 
@@ -34,6 +35,7 @@ async function bootstrap() {
     });
 
     app.useGlobalPipes(
+      new LowercaseReqKeysPipe(),
       new NumberParserPipe(),
       new BooleanParserPipe(),
       new DTOValidationPipe()

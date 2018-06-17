@@ -3,7 +3,7 @@ import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body, Delete,
 import { VideoService } from './video.service';
 import { CreateVideoDTO, UpdateVideoDTO, ListVideoDTO, videoOrderByParams,
 GetVideoByNameDTO } from './video.dtos';
-import { getOrderByProcessingPipes } from '../common/orderBy/orderByPipes.pipe';
+import { OrderByPipe } from '../common/orderBy/orderBy.pipe';
 
 @Controller()
 export class VideoController {
@@ -11,9 +11,7 @@ export class VideoController {
 
 
   @Get('/videos')
-  async List( @Query(
-    ...getOrderByProcessingPipes(videoOrderByParams)
-  ) query:ListVideoDTO ) {
+  async List( @Query(new OrderByPipe(videoOrderByParams)) query:ListVideoDTO ) {
     return await this.videoService.List(query)
     .catch(err => {
       throw new HttpException({
