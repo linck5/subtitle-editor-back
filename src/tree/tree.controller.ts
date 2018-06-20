@@ -1,8 +1,7 @@
 import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body, Delete,
   HttpException } from '@nestjs/common';
 import { TreeService } from './tree.service';
-import { CreateTreeDTO, UpdateTreeDTO, ListTreeDTO, treeOrderByParams,
-GetTreeByNameDTO } from './tree.dtos';
+import { CreateTreeDTO, UpdateTreeDTO, ListTreeDTO, treeOrderByParams } from './tree.dtos';
 import { OrderByPipe } from '../common/orderBy/orderBy.pipe';
 
 @Controller()
@@ -23,16 +22,6 @@ export class TreeController {
   @Get('/tree/:tree_id')
   async GetById( @Param('tree_id') tree_id) {
     return await this.treeService.GetById(tree_id)
-    .catch(err => {
-      throw new HttpException({
-        error: err
-      }, HttpStatus.BAD_REQUEST);
-    });
-  }
-
-  @Get('/tree')
-  async GetByName( @Query() query:GetTreeByNameDTO) {
-    return await this.treeService.FindByName(query.name)
     .catch(err => {
       throw new HttpException({
         error: err

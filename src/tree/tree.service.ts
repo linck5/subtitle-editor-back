@@ -17,12 +17,16 @@ export class TreeService {
 
     onModuleInit() { }
 
+
+    readonly language: string;
+
+
     async Create(tree: CreateTreeDTO): Promise<Tree> {
       const NewTree = new this.treeModel({
-        name: tree.name,
+        language: tree.language,
         description: tree.description,
-        duration: tree.duration,
-        url: tree.url
+        video_id: tree.video_id,
+        subtitle_id: tree.subtitle_id
       });
       return await NewTree.save();
     }

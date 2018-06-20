@@ -1,45 +1,32 @@
 
-import { IsString, IsInt, IsUrl, IsAscii, IsBoolean, IsDate
+import { IsString, IsInt, IsUrl, IsMongoId, IsBoolean, IsDate
  } from 'class-validator';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
+import { Schema } from 'mongoose';
 
-
-export class GetTreeByNameDTO {
-
-  @IsString()
-  readonly name: string;
-}
 
 export class CreateTreeDTO {
 
   @IsString()
-  readonly name: string;
+  readonly language: string;
 
   @IsString()
   readonly description: string;
 
-  @IsInt()
-  readonly duration: number;
+  @IsMongoId()
+  readonly video_id: Schema.Types.ObjectId;
 
-  @IsUrl()
-  @IsString()
-  readonly url: string;
+  @IsMongoId()
+  readonly subtitle_id: Schema.Types.ObjectId;
 }
 
 export class UpdateTreeDTO {
 
-  @IsString()
-  readonly name: string;
+  @IsMongoId()
+  readonly video_id: Schema.Types.ObjectId;
 
-  @IsString()
-  readonly description: string;
-
-  @IsInt()
-  readonly duration: number;
-
-  @IsUrl()
-  @IsString()
-  readonly url: string;
+  @IsMongoId({each: true})
+  readonly mainline: Schema.Types.ObjectId[];
 }
 
 export class ListTreeDTO {
@@ -58,4 +45,4 @@ export class ListTreeDTO {
 }
 
 export const treeOrderByParams =
-['name', 'creation', /*'subtitleTreeCount',*/ 'duration']
+['creation']
