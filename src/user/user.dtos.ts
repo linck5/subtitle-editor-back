@@ -72,4 +72,4 @@ export class ListUserDTO {
 }
 
 export const userOrderByParams =
-['username', 'creation', /*'branchCount',*/ 'lastonline']
+['username', 'creation', 'lastonline']

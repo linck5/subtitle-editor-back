@@ -33,8 +33,11 @@ export const VideoSchema = new Schema({
   creation: {
     type: Date,
     default: Date.now()
-  }
-  //subtitleTrees: SubtitleTree[]
+  },
+  trees: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Tree'
+  }],
 
 });
 VideoSchema.plugin(mongoosePaginate);

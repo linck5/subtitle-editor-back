@@ -25,7 +25,10 @@ export const UserSchema = new Schema({
   roles: {
     type: [{ type: String, enum: ['ADMIN', 'MODERATOR']}]
   },
-  //branches: Branch[],
+  branches: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Branch'
+  }],
   creation: {
     type: Date,
     default: Date.now()

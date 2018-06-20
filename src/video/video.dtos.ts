@@ -58,4 +58,4 @@ export class ListVideoDTO {
 }
 
 export const videoOrderByParams =
-['name', 'creation', /*'subtitleTreeCount',*/ 'duration']
+['name', 'creation', 'duration']
