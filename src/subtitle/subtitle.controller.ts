@@ -1,38 +1,16 @@
-import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body, Delete,
+import { Controller, Post, HttpStatus, Param, Get, Body, Delete,
   HttpException } from '@nestjs/common';
 import { SubtitleService } from './subtitle.service';
-import { CreateSubtitleDTO, UpdateSubtitleDTO, ListSubtitleDTO, subtitleOrderByParams,
-GetSubtitleByNameDTO } from './subtitle.dtos';
-import { OrderByPipe } from '../common/orderBy/orderBy.pipe';
+import { CreateSubtitleDTO, CreateSubtitleFromASSFileDTO} from './subtitle.dtos';
 
 @Controller()
 export class SubtitleController {
   constructor(private readonly subtitleService: SubtitleService) { }
 
 
-  @Get('/subtitles')
-  async List( @Query(new OrderByPipe(subtitleOrderByParams)) query:ListSubtitleDTO ) {
-    return await this.subtitleService.List(query)
-    .catch(err => {
-      throw new HttpException({
-        error: err
-      }, HttpStatus.BAD_REQUEST);
-    });
-  }
-
   @Get('/subtitle/:subtitle_id')
   async GetById( @Param('subtitle_id') subtitle_id) {
     return await this.subtitleService.GetById(subtitle_id)
-    .catch(err => {
-      throw new HttpException({
-        error: err
-      }, HttpStatus.BAD_REQUEST);
-    });
-  }
-
-  @Get('/subtitle')
-  async GetByName( @Query() query:GetSubtitleByNameDTO) {
-    return await this.subtitleService.FindByName(query.name)
     .catch(err => {
       throw new HttpException({
         error: err
@@ -50,9 +28,9 @@ export class SubtitleController {
     });
   }
 
-  @Patch('/subtitle/:subtitle_id')
-  async Update( @Param('subtitle_id') subtitle_id, @Body() updateSubtitleDTO:UpdateSubtitleDTO) {
-    return await this.subtitleService.Update(subtitle_id, updateSubtitleDTO)
+  @Post('/subtitles/fromAss')
+  async CreateFromASSFile( @Body() dto:CreateSubtitleFromASSFileDTO) {
+    return await this.subtitleService.CreateFromASSFile(dto.assstring)
     .catch(err => {
       throw new HttpException({
         error: err

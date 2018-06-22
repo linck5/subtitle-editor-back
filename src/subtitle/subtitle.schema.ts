@@ -1,40 +1,20 @@
 import { Document, Schema } from 'mongoose';
-var mongoosePaginate = require('mongoose-paginate');
+import { Line, LineSchema } from './line/line.schema';
 
 export interface Subtitle extends Document {
-  name: string,
-  description: string,
-  duration: number,
-  url: string,
-  creation: Date
-  //subtitleTrees: SubtitleTree[]
+  lines: Line[],
+  lastId: number,
 }
 
 export const SubtitleSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true
+  lines: {
+    type: [LineSchema],
+    requered: true
   },
-  description: {
-    type: String,
-  },
-  duration: {
+
+  lastId: {
     type: Number,
-    required: true,
-    get: v => Math.round(v),
-    set: v => Math.round(v)
-  },
-  url: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  creation: {
-    type: Date,
-    default: Date.now()
+    required: true
   }
-  //subtitleTrees: SubtitleTree[]
 
 });
-SubtitleSchema.plugin(mongoosePaginate);
