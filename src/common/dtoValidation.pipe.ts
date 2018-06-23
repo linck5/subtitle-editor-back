@@ -14,7 +14,9 @@ export class DTOValidationPipe implements PipeTransform<any> {
     skipMissingProperties: true
   }
 
-  async transform(dto, {metatype}: ArgumentMetadata) {
+  async transform(dto, {metatype, type}: ArgumentMetadata) {
+
+    if(type == 'param') return dto;
 
     const dtoClass = plainToClass(metatype, dto);
 
@@ -23,10 +25,26 @@ export class DTOValidationPipe implements PipeTransform<any> {
     if(errors.length > 0){
       throw new HttpException({
         code: 'validationError',
-        message: Object.values(errors[0].constraints)[0]
+        message: findFirstConstraint(errors[0])
       }, HttpStatus.BAD_REQUEST);
     }
 
     return dto;
   }
+}
+
+
+function findFirstConstraint(obj) {
+
+  if (obj.constraints)
+    return Object.values(obj.constraints)[0];
+
+  for (const value of Object.values(obj)){
+
+    if (typeof value == 'object') {
+      const found = findFirstConstraint(value);
+      if (found) return found;
+    }
+  }
+
 }
