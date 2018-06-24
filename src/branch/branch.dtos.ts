@@ -1,45 +1,21 @@
 
-import { IsString, IsInt, IsUrl, IsAscii, IsBoolean, IsDate
- } from 'class-validator';
+import { IsString, IsInt, IsBoolean, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
+import { UpdateBranchCollaboratorDTO } from './collaborator/collaborator.dtos'
 
-
-export class GetBranchByNameDTO {
-
-  @IsString()
-  readonly name: string;
-}
-
-export class CreateBranchDTO {
-
-  @IsString()
-  readonly name: string;
-
-  @IsString()
-  readonly description: string;
-
-  @IsInt()
-  readonly duration: number;
-
-  @IsUrl()
-  @IsString()
-  readonly url: string;
-}
 
 export class UpdateBranchDTO {
 
   @IsString()
-  readonly name: string;
+  readonly status: string;
 
-  @IsString()
-  readonly description: string;
+  @IsBoolean()
+  readonly deleted: boolean;
 
-  @IsInt()
-  readonly duration: number;
-
-  @IsUrl()
-  @IsString()
-  readonly url: string;
+  @ValidateNested({ each: true })
+  @Type(() => UpdateBranchCollaboratorDTO)
+  readonly collaborators: UpdateBranchCollaboratorDTO[];
 }
 
 export class ListBranchDTO {
@@ -58,4 +34,4 @@ export class ListBranchDTO {
 }
 
 export const branchOrderByParams =
-['name', 'creation', /*'subtitleTreeCount',*/ 'duration']
+['status']

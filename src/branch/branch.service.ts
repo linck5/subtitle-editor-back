@@ -2,9 +2,9 @@ import { Model, PaginateModel, PaginateResult, PaginateOptions,
   ModelFindByIdAndUpdateOptions } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { Branch } from './branch.schema';
-import { CreateBranchDTO, UpdateBranchDTO, ListBranchDTO } from './branch.dtos';
+import { UpdateBranchDTO, ListBranchDTO } from './branch.dtos';
 import { InjectModel } from '@nestjs/mongoose';
-
+import { PaginationService } from '../common/pagination.service';
 
 @Injectable()
 // tslint:disable-next-line:component-class-suffix
@@ -12,17 +12,17 @@ export class BranchService {
 
     constructor(
       @InjectModel('Branch') private readonly branchModel: Model<Branch>,
-      @InjectModel('Branch') private readonly paginateBranchModel: PaginateModel<Branch>
+      @InjectModel('Branch') private readonly paginateBranchModel: PaginateModel<Branch>,
+      private readonly paginationService: PaginationService
     ) { }
 
     onModuleInit() { }
 
-    async Create(branch: CreateBranchDTO): Promise<Branch> {
+    async Create(): Promise<Branch> {
       const NewBranch = new this.branchModel({
-        name: branch.name,
-        description: branch.description,
-        duration: branch.duration,
-        url: branch.url
+        collaborators: [],
+        status: "UNMODIFIED",
+        deleted: false
       });
       return await NewBranch.save();
     }
@@ -48,26 +48,10 @@ export class BranchService {
 
       let query:any = {};
 
-      let options:PaginateOptions = {
-        sort: {}
-      };
-
-      //the pagination library won't work assigning undefined to
-      //PaginateOptions feilds, so conditionally assign them:
-      if(dto.limit) options.limit = dto.limit;
-      if(dto.offset) options.offset = dto.offset;
-      if(dto.page) options.page = dto.page;
-      if(dto.orderby && dto.orderby.length > 0){
-        dto.orderby.map(orderByParam => {
-          options.sort[orderByParam.field] = orderByParam.desc? -1:1
-        });
-      };
+      const options = this.paginationService.PaginateOptionsFromDto(dto);
 
       return await this.paginateBranchModel.paginate(query, options);
 
     }
 
-    async FindByName(branch_name: string): Promise<Branch> {
-      return await this.branchModel.findOne({ name: branch_name });
-    }
 }

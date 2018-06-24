@@ -1,8 +1,7 @@
-import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body, Delete,
+import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body,
   HttpException } from '@nestjs/common';
 import { BranchService } from './branch.service';
-import { CreateBranchDTO, UpdateBranchDTO, ListBranchDTO, branchOrderByParams,
-GetBranchByNameDTO } from './branch.dtos';
+import { UpdateBranchDTO, ListBranchDTO, branchOrderByParams } from './branch.dtos';
 import { OrderByPipe } from '../common/orderBy/orderBy.pipe';
 
 @Controller()
@@ -10,7 +9,7 @@ export class BranchController {
   constructor(private readonly branchService: BranchService) { }
 
 
-  @Get('/branchs')
+  @Get('/branches')
   async List( @Query(new OrderByPipe(branchOrderByParams)) query:ListBranchDTO ) {
     return await this.branchService.List(query)
     .catch(err => {
@@ -30,19 +29,9 @@ export class BranchController {
     });
   }
 
-  @Get('/branch')
-  async GetByName( @Query() query:GetBranchByNameDTO) {
-    return await this.branchService.FindByName(query.name)
-    .catch(err => {
-      throw new HttpException({
-        error: err
-      }, HttpStatus.BAD_REQUEST);
-    });
-  }
-
-  @Post('/branchs')
-  async Create( @Body() addBranchDTO:CreateBranchDTO) {
-    return await this.branchService.Create(addBranchDTO)
+  @Post('/branches')
+  async Create() {
+    return await this.branchService.Create()
     .catch(err => {
       throw new HttpException({
         error: err
@@ -60,13 +49,21 @@ export class BranchController {
     });
   }
 
-  @Delete('/branch/:branch_id')
-  async Delete( @Param('branch_id') branch_id) {
-    return await this.branchService.Delete(branch_id)
-    .catch(err => {
-      throw new HttpException({
-        error: err
-      }, HttpStatus.BAD_REQUEST);
-    });
+  @Patch('/branch/:branch_id/collaborators/add/:collaborator_id')
+  async AddCollaborator(
+    @Param('branch_id') branch_id,
+    @Param('collaborator_id') collaborator_id)
+    {
+    return null; //TODO
   }
+
+  @Patch('/branch/:branch_id/collaborators/remove/:collaborator_id')
+  async RemoveCollaborator(
+    @Param('branch_id') branch_id,
+    @Param('collaborator_id') collaborator_id)
+    {
+    return null; //TODO
+  }
+
+
 }

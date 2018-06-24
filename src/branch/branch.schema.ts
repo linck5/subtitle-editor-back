@@ -1,40 +1,32 @@
 import { Document, Schema } from 'mongoose';
+import { Collaborator, CollaboratorSchema } from './collaborator/collaborator.schema'
 var mongoosePaginate = require('mongoose-paginate');
 
 export interface Branch extends Document {
-  name: string,
-  description: string,
-  duration: number,
-  url: string,
-  creation: Date
-  //subtitleTrees: SubtitleTree[]
+  collaborators: Collaborator[],
+  status: string[],
+  deleted: boolean,
+  //TODO baseCommits: Commit[]
 }
 
 export const BranchSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  description: {
-    type: String,
-  },
-  duration: {
-    type: Number,
-    required: true,
-    get: v => Math.round(v),
-    set: v => Math.round(v)
-  },
-  url: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  creation: {
-    type: Date,
-    default: Date.now()
-  }
-  //subtitleTrees: SubtitleTree[]
 
+  collaborators: {
+    type: [CollaboratorSchema],
+  },
+  status: {
+    type: String,
+    enum: ["UNMODIFIED", "IN_PROGRESS", "FINISHED", "APPROVED", "MERGED"],
+    default: "UNMODIFIED"
+  },
+  deleted: {
+    type: Boolean,
+    default: false
+  },
+  //TODO
+  // baseCommits: [{
+  //   type: Schema.Types.ObjectId,
+  //   ref: 'Commit'
+  // }]
 });
 BranchSchema.plugin(mongoosePaginate);
