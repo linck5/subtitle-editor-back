@@ -60,6 +60,16 @@ export class VideoController {
     });
   }
 
+  @Patch('/video/:video_id/trees/add/:tree_id')
+  async AddTree( @Param('video_id') video_id, @Param('tree_id') tree_id) {
+    return null; //TODO
+  }
+
+  @Patch('/video/:video_id/trees/remove/:tree_id')
+  async RemoveTree( @Param('video_id') video_id, @Param('tree_id') tree_id) {
+    return null; //TODO
+  }
+
   @Delete('/video/:video_id')
   async Delete( @Param('video_id') video_id) {
     return await this.videoService.Delete(video_id)
