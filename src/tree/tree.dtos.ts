@@ -1,5 +1,5 @@
 
-import { IsString, IsInt, IsUrl, IsMongoId, IsBoolean, IsDate
+import { IsString, IsInt, IsDefined, IsMongoId, IsBoolean, IsDate
  } from 'class-validator';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 import { Schema } from 'mongoose';
@@ -7,15 +7,18 @@ import { Schema } from 'mongoose';
 
 export class CreateTreeDTO {
 
+  @IsDefined()
   @IsString()
   readonly language: string;
 
   @IsString()
   readonly description: string;
 
+  @IsDefined()
   @IsMongoId()
   readonly video_id: Schema.Types.ObjectId;
 
+  @IsDefined()
   @IsMongoId()
   readonly subtitle_id: Schema.Types.ObjectId;
 }

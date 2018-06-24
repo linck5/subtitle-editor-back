@@ -9,7 +9,7 @@ export interface Subtitle extends Document {
 export const SubtitleSchema = new Schema({
   lines: {
     type: [LineSchema],
-    requered: true
+    required: true
   },
 
   lastId: {

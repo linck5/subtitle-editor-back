@@ -1,13 +1,15 @@
 
-import { IsString, IsInt, MinLength, IsAscii, IsBoolean, IsDate
+import { IsString, IsInt, MinLength, IsAscii, IsBoolean, IsDate, IsDefined
  } from 'class-validator';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 
 export class AuthUserDTO {
 
+  @IsDefined()
   @IsString()
   readonly username: string;
 
+  @IsDefined()
   @MinLength(5)
   @IsAscii()
   readonly password: string;
@@ -15,15 +17,18 @@ export class AuthUserDTO {
 
 export class GetUserByNameDTO {
 
+  @IsDefined()
   @IsString()
   readonly username: string;
 }
 
 export class CreateUserDTO {
 
+  @IsDefined()
   @IsString()
   readonly username: string;
 
+  @IsDefined()
   @MinLength(5)
   @IsAscii()
   readonly password: string;

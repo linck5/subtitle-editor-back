@@ -1,4 +1,5 @@
 import { Document, Schema } from 'mongoose';
+import { Tree }from '../tree/tree.schema'
 var mongoosePaginate = require('mongoose-paginate');
 
 export interface Video extends Document {
@@ -6,8 +7,8 @@ export interface Video extends Document {
   description: string,
   duration: number,
   url: string,
-  creation: Date
-  //subtitleTrees: SubtitleTree[]
+  creation: Date,
+  subtitleTrees: Tree[]
 }
 
 export const VideoSchema = new Schema({

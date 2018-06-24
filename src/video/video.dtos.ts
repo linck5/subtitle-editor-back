@@ -1,26 +1,29 @@
 
-import { IsString, IsInt, IsUrl, IsAscii, IsBoolean, IsDate
- } from 'class-validator';
+import { IsString, IsInt, IsUrl, IsMongoId, IsDefined } from 'class-validator';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 
 
 export class GetVideoByNameDTO {
 
+  @IsDefined()
   @IsString()
   readonly name: string;
 }
 
 export class CreateVideoDTO {
 
+  @IsDefined()
   @IsString()
   readonly name: string;
 
   @IsString()
   readonly description: string;
 
+  @IsDefined()
   @IsInt()
   readonly duration: number;
 
+  @IsDefined()
   @IsUrl()
   @IsString()
   readonly url: string;
@@ -40,6 +43,9 @@ export class UpdateVideoDTO {
   @IsUrl()
   @IsString()
   readonly url: string;
+
+  @IsMongoId({each: true})
+  readonly trees: string[];
 }
 
 export class ListVideoDTO {
