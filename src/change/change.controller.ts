@@ -1,8 +1,7 @@
 import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body, Delete,
   HttpException } from '@nestjs/common';
 import { ChangeService } from './change.service';
-import { CreateChangeDTO, UpdateChangeDTO, ListChangeDTO, changeOrderByParams,
-GetChangeByNameDTO } from './change.dtos';
+import { CreateChangeDTO, ListChangeDTO, changeOrderByParams} from './change.dtos';
 import { OrderByPipe } from '../common/orderBy/orderBy.pipe';
 
 @Controller()
@@ -30,29 +29,10 @@ export class ChangeController {
     });
   }
 
-  @Get('/change')
-  async GetByName( @Query() query:GetChangeByNameDTO) {
-    return await this.changeService.FindByName(query.name)
-    .catch(err => {
-      throw new HttpException({
-        error: err
-      }, HttpStatus.BAD_REQUEST);
-    });
-  }
 
   @Post('/changes')
   async Create( @Body() addChangeDTO:CreateChangeDTO) {
     return await this.changeService.Create(addChangeDTO)
-    .catch(err => {
-      throw new HttpException({
-        error: err
-      }, HttpStatus.BAD_REQUEST);
-    });
-  }
-
-  @Patch('/change/:change_id')
-  async Update( @Param('change_id') change_id, @Body() updateChangeDTO:UpdateChangeDTO) {
-    return await this.changeService.Update(change_id, updateChangeDTO)
     .catch(err => {
       throw new HttpException({
         error: err

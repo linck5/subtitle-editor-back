@@ -1,40 +1,33 @@
 import { Document, Schema } from 'mongoose';
+import { Branch } from '../branch/branch.schema'
 var mongoosePaginate = require('mongoose-paginate');
 
 export interface Commit extends Document {
-  name: string,
-  description: string,
-  duration: number,
-  url: string,
-  creation: Date
-  //subtitleTrees: SubtitleTree[]
+  description: string;
+  branch: Branch;
+  done: boolean;
+  comments: Comment[];
+  creation: Date;
+
 }
 
 export const CommitSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true
-  },
   description: {
     type: String,
   },
-  duration: {
-    type: Number,
-    required: true,
-    get: v => Math.round(v),
-    set: v => Math.round(v)
+  branch: {
+    type: Schema.Types.ObjectId,
+    ref: 'Branch',
+    index: true
   },
-  url: {
-    type: String,
-    required: true,
-    unique: true
+  done: {
+    type: Boolean,
+    default: false
   },
+  //comments: Comment[],
   creation: {
     type: Date,
     default: Date.now()
   }
-  //subtitleTrees: SubtitleTree[]
-
 });
 CommitSchema.plugin(mongoosePaginate);

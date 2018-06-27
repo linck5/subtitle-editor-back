@@ -1,45 +1,36 @@
 
-import { IsString, IsInt, IsUrl, IsAscii, IsBoolean, IsDate
+import { IsString, IsInt, IsUrl, IsMongoId, ValidateNested, IsNumber, IsDefined
  } from 'class-validator';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
+import { Schema } from 'mongoose';
+import { Type } from 'class-transformer';
 
 
-export class GetChangeByNameDTO {
 
-  @IsString()
-  readonly name: string;
-}
 
 export class CreateChangeDTO {
 
+  @IsDefined()
+  @IsInt({each: true})
+  readonly lineIds: number[];
+
+  @IsDefined()
+  @IsMongoId()
+  readonly user: Schema.Types.ObjectId;
+
+  @IsDefined()
+  @IsMongoId()
+  readonly commit: Schema.Types.ObjectId;
+
+  @IsDefined()
   @IsString()
-  readonly name: string;
+  readonly type: string;
 
-  @IsString()
-  readonly description: string;
 
-  @IsInt()
-  readonly duration: number;
+  @ValidateNested()
+  @Type(() => ChangeDataDTO)
+  readonly data: ChangeDataDTO;
 
-  @IsUrl()
-  @IsString()
-  readonly url: string;
-}
-
-export class UpdateChangeDTO {
-
-  @IsString()
-  readonly name: string;
-
-  @IsString()
-  readonly description: string;
-
-  @IsInt()
-  readonly duration: number;
-
-  @IsUrl()
-  @IsString()
-  readonly url: string;
 }
 
 export class ListChangeDTO {
@@ -58,4 +49,19 @@ export class ListChangeDTO {
 }
 
 export const changeOrderByParams =
-['name', 'creation', /*'subtitleTreeCount',*/ 'duration']
+['type', 'user', 'commit'];
+
+
+export class ChangeDataDTO {
+
+  @IsNumber()
+  readonly startTime: number;
+
+  @IsNumber()
+  readonly endTime: number;
+
+  @IsString()
+  readonly text: string;
+
+  //position? //TODO
+}

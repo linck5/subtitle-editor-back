@@ -1,8 +1,7 @@
-import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body, Delete,
+import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body,
   HttpException } from '@nestjs/common';
 import { CommitService } from './commit.service';
-import { CreateCommitDTO, UpdateCommitDTO, ListCommitDTO, commitOrderByParams,
-GetCommitByNameDTO } from './commit.dtos';
+import { CreateCommitDTO, UpdateCommitDTO, ListCommitDTO, commitOrderByParams } from './commit.dtos';
 import { OrderByPipe } from '../common/orderBy/orderBy.pipe';
 
 @Controller()
@@ -30,16 +29,6 @@ export class CommitController {
     });
   }
 
-  @Get('/commit')
-  async GetByName( @Query() query:GetCommitByNameDTO) {
-    return await this.commitService.FindByName(query.name)
-    .catch(err => {
-      throw new HttpException({
-        error: err
-      }, HttpStatus.BAD_REQUEST);
-    });
-  }
-
   @Post('/commits')
   async Create( @Body() addCommitDTO:CreateCommitDTO) {
     return await this.commitService.Create(addCommitDTO)
@@ -60,13 +49,4 @@ export class CommitController {
     });
   }
 
-  @Delete('/commit/:commit_id')
-  async Delete( @Param('commit_id') commit_id) {
-    return await this.commitService.Delete(commit_id)
-    .catch(err => {
-      throw new HttpException({
-        error: err
-      }, HttpStatus.BAD_REQUEST);
-    });
-  }
 }

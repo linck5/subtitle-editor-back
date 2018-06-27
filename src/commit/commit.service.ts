@@ -21,10 +21,8 @@ export class CommitService {
 
     async Create(commit: CreateCommitDTO): Promise<Commit> {
       const NewCommit = new this.commitModel({
-        name: commit.name,
         description: commit.description,
-        duration: commit.duration,
-        url: commit.url
+        branch: commit.branch
       });
       return await NewCommit.save();
     }
@@ -37,9 +35,6 @@ export class CommitService {
       return await this.commitModel.findByIdAndUpdate(id, commit, options);
     }
 
-    async Delete(id): Promise<Commit> {
-      return await this.commitModel.findByIdAndRemove(id);
-    }
 
     async GetById(id): Promise<Commit> {
       return await this.commitModel.findById(id);
@@ -49,6 +44,7 @@ export class CommitService {
     async List(dto:ListCommitDTO): Promise<PaginateResult<Commit>> {
 
       let query:any = {};
+      if(dto.done != undefined) query.done = dto.done;
 
       const options = this.paginationService.PaginateOptionsFromDto(dto);
 
@@ -56,7 +52,4 @@ export class CommitService {
 
     }
 
-    async FindByName(commit_name: string): Promise<Commit> {
-      return await this.commitModel.findOne({ name: commit_name });
-    }
 }

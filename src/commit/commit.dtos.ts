@@ -1,48 +1,32 @@
 
-import { IsString, IsInt, IsUrl, IsAscii, IsBoolean, IsDate
+import { IsString, IsInt, IsUrl, IsDefined, IsMongoId, IsBoolean
  } from 'class-validator';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 
 
-export class GetCommitByNameDTO {
-
-  @IsString()
-  readonly name: string;
-}
-
 export class CreateCommitDTO {
-
-  @IsString()
-  readonly name: string;
 
   @IsString()
   readonly description: string;
 
-  @IsInt()
-  readonly duration: number;
-
-  @IsUrl()
-  @IsString()
-  readonly url: string;
+  @IsDefined()
+  @IsMongoId()
+  readonly branch: string;
 }
 
 export class UpdateCommitDTO {
 
   @IsString()
-  readonly name: string;
-
-  @IsString()
   readonly description: string;
 
-  @IsInt()
-  readonly duration: number;
-
-  @IsUrl()
-  @IsString()
-  readonly url: string;
+  @IsBoolean()
+  readonly done: boolean;
 }
 
 export class ListCommitDTO {
+
+  @IsBoolean()
+  readonly done:boolean;
 
   @IsInt()
   readonly limit: number;
@@ -58,4 +42,4 @@ export class ListCommitDTO {
 }
 
 export const commitOrderByParams =
-['name', 'creation', /*'subtitleTreeCount',*/ 'duration']
+['branch']

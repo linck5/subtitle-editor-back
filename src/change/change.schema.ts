@@ -1,40 +1,60 @@
 import { Document, Schema } from 'mongoose';
+import { User } from '../user/user.schema';
+import { Commit } from '../commit/commit.schema';
 var mongoosePaginate = require('mongoose-paginate');
 
 export interface Change extends Document {
-  name: string,
-  description: string,
-  duration: number,
-  url: string,
-  creation: Date
-  //subtitleTrees: SubtitleTree[]
+  lineIds: number[];
+  user: User;
+  commit: Commit;
+  creation: Date;
+  type: string;
+  data: {
+    startTime: number;
+    endTime: number;
+    text: string;
+    //position? //TODO
+  }
+
 }
 
 export const ChangeSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  description: {
-    type: String,
-  },
-  duration: {
+  lineIds: [{
     type: Number,
-    required: true,
-    get: v => Math.round(v),
-    set: v => Math.round(v)
+    required: true
+  }],
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
-  url: {
-    type: String,
+  commit: {
+    type: Schema.Types.ObjectId,
+    ref: 'Commit',
     required: true,
-    unique: true
+    index: true
   },
   creation: {
     type: Date,
     default: Date.now()
+  },
+  type: {
+    type: String,
+    enum: ["CREATE", "EDIT", "TIME_SHIFT", "DELETE"],
+    required: true
+  },
+  data: {
+    startTime: {
+      type: Number
+    },
+    endTime: {
+      type: Number
+    },
+    text: {
+      type: String
+    }
+    //position? //TODO
   }
-  //subtitleTrees: SubtitleTree[]
 
 });
 ChangeSchema.plugin(mongoosePaginate);
