@@ -3,9 +3,9 @@ import { Collaborator, CollaboratorSchema } from './collaborator/collaborator.sc
 var mongoosePaginate = require('mongoose-paginate');
 
 export interface Branch extends Document {
-  collaborators: Collaborator[],
-  status: string[],
-  deleted: boolean,
+  collaborators: Collaborator[];
+  status: string;
+  deleted: boolean;
   //TODO baseCommits: Commit[]
 }
 

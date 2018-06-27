@@ -2,12 +2,12 @@ import { Document, Schema } from 'mongoose';
 var mongoosePaginate = require('mongoose-paginate');
 
 export interface Tree extends Document {
-  description: string,
-  language: string,
-  video: Schema.Types.ObjectId,
-  subtitle:Schema.Types.ObjectId,
-  mainline:Schema.Types.ObjectId[],
-  creation: Date
+  description: string;
+  language: string;
+  video: Schema.Types.ObjectId;
+  subtitle:Schema.Types.ObjectId;
+  mainline:Schema.Types.ObjectId[];
+  creation: Date;
 }
 
 export const TreeSchema = new Schema({

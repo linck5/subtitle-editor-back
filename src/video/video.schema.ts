@@ -3,12 +3,12 @@ import { Tree }from '../tree/tree.schema'
 var mongoosePaginate = require('mongoose-paginate');
 
 export interface Video extends Document {
-  name: string,
-  description: string,
-  duration: number,
-  url: string,
-  creation: Date,
-  subtitleTrees: Tree[]
+  name: string;
+  description: string;
+  duration: number;
+  url: string;
+  creation: Date;
+  subtitleTrees: Tree[];
 }
 
 export const VideoSchema = new Schema({
