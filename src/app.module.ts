@@ -11,12 +11,13 @@ import { CommitModule } from './commit/commit.module';
 import { SubtitleModule } from './subtitle/subtitle.module';
 import { TreeModule } from './tree/tree.module';
 import { VideoModule } from './video/video.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
     imports: [
       MongooseModule.forRoot(process.env.DB_CONN),
       AuthModule, UserModule, CommonModule, BranchModule, ChangeModule,
-      CommitModule, SubtitleModule, TreeModule, VideoModule
+      CommitModule, SubtitleModule, TreeModule, VideoModule, CommentModule
     ]
 
 })
