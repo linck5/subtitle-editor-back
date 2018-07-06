@@ -1,6 +1,5 @@
 import { sign } from 'jsonwebtoken';
-import { Injectable, Inject } from '@nestjs/common';
-import { promise } from 'selenium-webdriver';
+import { Injectable } from '@nestjs/common';
 import { User } from '../user/user.schema';
 
 
@@ -12,7 +11,7 @@ export class AuthService {
 
 
     public createToken(user: User): any {
-      const expiresIn = '48h'
+      const expiresIn = process.env.JWT_EXPIRES_IN;
       const secretOrKey = process.env.JWT_SWECRET;
       const Payload = { username: user.username, roles: user.roles };
       const token = sign(Payload, secretOrKey, { expiresIn });
