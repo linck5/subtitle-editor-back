@@ -1,12 +1,11 @@
 import { Document, Schema } from 'mongoose';
-import { Branch } from '../branch/branch.schema'
 var mongoosePaginate = require('mongoose-paginate');
 
 export interface User extends Document {
   username: string;
   password: string;
   roles: string[];
-  branches: Branch[];
+  branches: Schema.Types.ObjectId[];
   creation: Date;
   lastOnline: Date;
   banned: boolean;

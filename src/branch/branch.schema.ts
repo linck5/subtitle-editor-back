@@ -6,6 +6,7 @@ export interface Branch extends Document {
   collaborators: Collaborator[];
   status: string;
   deleted: boolean;
+  source: string; //the source branch of a merged branch is the branch that merged into the mainline
   //TODO baseCommits: Commit[]
 }
 
@@ -16,12 +17,16 @@ export const BranchSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ["UNMODIFIED", "IN_PROGRESS", "FINISHED", "APPROVED", "MERGED"],
+    enum: ["UNMODIFIED", "IN_PROGRESS", "FINISHED", "APPROVED", "MERGED", "ROOT"],
     default: "UNMODIFIED"
   },
   deleted: {
     type: Boolean,
     default: false
+  },
+  source: {
+    type: Schema.Types.ObjectId,
+    ref: 'Branch'
   },
   //TODO
   // baseCommits: [{

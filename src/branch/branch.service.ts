@@ -19,6 +19,13 @@ export class BranchService {
     onModuleInit() { }
 
     async Create(): Promise<Branch> {
+
+      //TODO set base commits
+
+
+      //TODO put a reference to the tree in the user
+      //TODO add a collaborator to the branch referencing the user
+
       const NewBranch = new this.branchModel({
         collaborators: [],
         status: "UNMODIFIED",

@@ -11,7 +11,8 @@ ct --> artt[Add a reference to the tree in the video]
 artt --> efrstt>User edits a subtitle]
 
 efrstt --> cb[Create a branch]
-cb --> arttu[Put a reference to the tree in the user's branch]
+cb --> sbcfb[Set the base commits for the branch]
+sbcfb --> arttu[Put a reference to the branch in the user]
 arttu --> acttb[Add a collaborator to the branch referencing the user]
 acttb --> sinpro[Set branch field `status` to IN_PROGRESS]
 sinpro --> cc[Create a new commit for the branch]
@@ -23,7 +24,6 @@ cch --> ummc>User makes more changes]
 ummc --> cch["Create a change referencing the<br/> commit, the user, and the line(s)"]
 
 cch --> ucmtc>User commits the changes]
-sinpro --> ucmtc
 
 ucmtc --> sdtt[Set commit field `done` to true]
 
@@ -82,17 +82,18 @@ graph TB
 Comment --> Or((or))
 Comment --> User
 
-Or --> Commit
-Or --> Change
+Or -.-> Commit
+Or -.-> Change
 
 Video -->|"[ ]"| Tree
 
 Tree --> Video
 Tree --> Subtitle
-Tree -.->|"mainline [ ]"| Commit
+Tree -->|"mainline [ ]"| Commit
 
 Branch -->|"{[ ]}"| Collaborator
-Branch -.->|"base commmits[ ]"| Commit
+Branch -->|"base commmits[ ]"| Commit
+Branch -.->|"source"| Branch
 
 Commit -->|"-i "| Branch
 
@@ -100,7 +101,7 @@ Change -->|"-i"| Commit
 Change --> User
 Change -->|"{[ ]}"| Line
 
-User -->|"[ ]"| Branch
+User -.->|"[ ]"| Branch
 
 Collaborator --> User
 
@@ -112,6 +113,7 @@ Subtitle -->|"{[ ]}"| Line
 - **-i** = index
 - **[ ]** array
 -  **{[ ]}** embeded array
+-  *dotted line* : optional reference
 
 
 

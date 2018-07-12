@@ -8,7 +8,7 @@ export interface Video extends Document {
   duration: number;
   url: string;
   creation: Date;
-  subtitleTrees: Tree[];
+  trees: Schema.Types.ObjectId[];
 }
 
 export const VideoSchema = new Schema({
