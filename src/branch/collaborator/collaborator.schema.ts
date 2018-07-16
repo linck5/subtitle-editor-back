@@ -18,4 +18,4 @@ export const CollaboratorSchema = new Schema({
   admin: Boolean,
   banned: Boolean
 
-});
+}, {_id: false});

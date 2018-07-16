@@ -1,9 +1,19 @@
 
-import { IsString, IsInt, IsBoolean, ValidateNested } from 'class-validator';
+import { IsString, IsInt, IsBoolean, ValidateNested, IsMongoId, IsDefined } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 import { UpdateBranchCollaboratorDTO } from './collaborator/collaborator.dtos'
 
+export class CreateBranchDTO {
+
+  @IsDefined()
+  @IsMongoId()
+  readonly creator: string;
+
+  @IsDefined()
+  @IsMongoId()
+  readonly tree: string;
+}
 
 export class UpdateBranchDTO {
 

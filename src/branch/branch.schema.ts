@@ -7,7 +7,7 @@ export interface Branch extends Document {
   status: string;
   deleted: boolean;
   source: string; //the source branch of a merged branch is the branch that merged into the mainline
-  //TODO baseCommits: Commit[]
+  baseCommits: Schema.Types.ObjectId[];
 }
 
 export const BranchSchema = new Schema({
@@ -28,10 +28,9 @@ export const BranchSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Branch'
   },
-  //TODO
-  // baseCommits: [{
-  //   type: Schema.Types.ObjectId,
-  //   ref: 'Commit'
-  // }]
+  baseCommits: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Commit'
+  }]
 });
 BranchSchema.plugin(mongoosePaginate);

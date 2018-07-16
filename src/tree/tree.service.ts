@@ -65,7 +65,6 @@ export class TreeService {
 
       return await NewTree.save();
 
-
     }
 
     async Update(id, tree: UpdateTreeDTO): Promise<Tree> {

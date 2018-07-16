@@ -1,7 +1,7 @@
 import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body,
   HttpException } from '@nestjs/common';
 import { BranchService } from './branch.service';
-import { UpdateBranchDTO, ListBranchDTO, branchOrderByParams } from './branch.dtos';
+import { CreateBranchDTO, UpdateBranchDTO, ListBranchDTO, branchOrderByParams } from './branch.dtos';
 import { OrderByPipe } from '../common/orderBy/orderBy.pipe';
 
 @Controller()
@@ -30,8 +30,8 @@ export class BranchController {
   }
 
   @Post('/branches')
-  async Create() {
-    return await this.branchService.Create()
+  async Create( @Body() createBranchDTO:CreateBranchDTO ) {
+    return await this.branchService.Create(createBranchDTO)
     .catch(err => {
       throw new HttpException({
         error: err
