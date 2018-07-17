@@ -6,8 +6,8 @@ export interface Branch extends Document {
   collaborators: Collaborator[];
   status: string;
   deleted: boolean;
-  source: string; //the source branch of a merged branch is the branch that merged into the mainline
-  baseCommits: Schema.Types.ObjectId[];
+  source_id: string; //the source branch of a merged branch is the branch that merged into the mainline
+  baseCommit_ids: Schema.Types.ObjectId[];
 }
 
 export const BranchSchema = new Schema({
@@ -24,11 +24,11 @@ export const BranchSchema = new Schema({
     type: Boolean,
     default: false
   },
-  source: {
+  source_id: {
     type: Schema.Types.ObjectId,
     ref: 'Branch'
   },
-  baseCommits: [{
+  baseCommit_ids: [{
     type: Schema.Types.ObjectId,
     ref: 'Commit'
   }]

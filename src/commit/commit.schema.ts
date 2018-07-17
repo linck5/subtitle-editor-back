@@ -4,9 +4,9 @@ var mongoosePaginate = require('mongoose-paginate');
 
 export interface Commit extends Document {
   description: string;
-  branch: Branch;
+  branch_id: Schema.Types.ObjectId;
   done: boolean;
-  comments: Comment[];
+  comment_ids: Schema.Types.ObjectId[];
   creation: Date;
 
 }
@@ -15,7 +15,7 @@ export const CommitSchema = new Schema({
   description: {
     type: String,
   },
-  branch: {
+  branch_id: {
     type: Schema.Types.ObjectId,
     ref: 'Branch',
     index: true
@@ -24,7 +24,7 @@ export const CommitSchema = new Schema({
     type: Boolean,
     default: false
   },
-  //comments: Comment[],
+  //TODO comment_ids: Comment[],
   creation: {
     type: Date,
     default: Date.now()

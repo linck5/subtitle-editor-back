@@ -26,7 +26,7 @@ export class CommentService {
     async Create(comment: CreateCommentDTO): Promise<Comment> {
 
       let commentObj:any = {
-        author: comment.author,
+        author_id: comment.author_id,
         content: comment.content,
         [comment.type]: null
       }

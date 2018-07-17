@@ -22,7 +22,7 @@ export class CommitService {
     async Create(commit: CreateCommitDTO): Promise<Commit> {
       const NewCommit = new this.commitModel({
         description: commit.description,
-        branch: commit.branch
+        branch_id: commit.branch_id
       });
       return await NewCommit.save();
     }

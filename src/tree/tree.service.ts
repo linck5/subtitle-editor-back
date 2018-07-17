@@ -36,7 +36,7 @@ export class TreeService {
         collaborators: [],
         status: "ROOT",
         deleted: false,
-        baseCommits: null
+        baseCommit_ids: null
       });
       await NewBranch.save();
 
@@ -52,14 +52,14 @@ export class TreeService {
       const NewTree = new this.treeModel({
         language: tree.language,
         description: tree.description,
-        video: tree.video_id,
-        subtitle: tree.subtitle_id,
+        video_id: tree.video_id,
+        subtitle_id: tree.subtitle_id,
         mainline: [NewCommit._id]
       });
 
       //put a reference to the tree in the video
-      let TreeVideo:Video = await this.videoModel.findById(NewTree.video);
-      TreeVideo.trees.push(NewTree._id);
+      let TreeVideo:Video = await this.videoModel.findById(NewTree.video_id);
+      TreeVideo.tree_ids.push(NewTree._id);
       TreeVideo.save();
 
 

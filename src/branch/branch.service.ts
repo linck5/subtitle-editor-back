@@ -27,12 +27,12 @@ export class BranchService {
     async Create(dto:CreateBranchDTO): Promise<Branch> {
 
 
-      const Tree:Tree = await this.treeModel.findById(dto.tree);
-      const Creator:User = await this.userModel.findById(dto.creator);
+      const Tree:Tree = await this.treeModel.findById(dto.tree_id);
+      const Creator:User = await this.userModel.findById(dto.creator_id);
 
       // create the collaborator document for the creator
       const CreatorAsCollaborator = new this.collaboratorModel({
-        user: Creator._id,
+        user_id: Creator._id,
         creator: true,
         admin: true
       });
@@ -45,11 +45,11 @@ export class BranchService {
         // any new branch is created on top of the mainline,
         // so the base commits is the mainline in the current state of
         // this branch's creation
-        baseCommits: Tree.mainline
+        baseCommit_ids: Tree.mainline
       });
 
       // put a reference to the branch in the user
-      Creator.branches.push(NewBranch._id);
+      Creator.branch_ids.push(NewBranch._id);
       await Creator.save();
 
       return await NewBranch.save();

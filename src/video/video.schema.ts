@@ -8,7 +8,7 @@ export interface Video extends Document {
   duration: number;
   url: string;
   creation: Date;
-  trees: Schema.Types.ObjectId[];
+  tree_ids: Schema.Types.ObjectId[];
 }
 
 export const VideoSchema = new Schema({
@@ -35,7 +35,7 @@ export const VideoSchema = new Schema({
     type: Date,
     default: Date.now()
   },
-  trees: [{
+  tree_ids: [{
     type: Schema.Types.ObjectId,
     ref: 'Tree'
   }],

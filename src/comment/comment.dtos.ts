@@ -14,16 +14,16 @@ export class CreateCommentDTO {
   @ValidateIf(o => o.type === 'change')
   @IsDefined()
   @IsMongoId()
-  readonly change: Schema.Types.ObjectId;
+  readonly change_id: Schema.Types.ObjectId;
 
   @ValidateIf(o => o.type === 'commit')
   @IsDefined()
   @IsMongoId()
-  readonly commit: Schema.Types.ObjectId;
+  readonly commit_id: Schema.Types.ObjectId;
 
   @IsDefined()
   @IsMongoId()
-  readonly author: Schema.Types.ObjectId;
+  readonly author_id: Schema.Types.ObjectId;
 
   @IsDefined()
   @IsString()

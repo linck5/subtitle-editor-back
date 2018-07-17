@@ -12,15 +12,15 @@ export class CreateChangeDTO {
 
   @IsDefined()
   @IsInt({each: true})
-  readonly lineIds: number[];
+  readonly line_ids: number[];
 
   @IsDefined()
   @IsMongoId()
-  readonly user: Schema.Types.ObjectId;
+  readonly user_id: Schema.Types.ObjectId;
 
   @IsDefined()
   @IsMongoId()
-  readonly commit: Schema.Types.ObjectId;
+  readonly commit_id: Schema.Types.ObjectId;
 
   @IsDefined()
   @IsString()

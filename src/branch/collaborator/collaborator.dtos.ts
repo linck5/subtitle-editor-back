@@ -6,7 +6,7 @@ export class UpdateBranchCollaboratorDTO {
 
   @IsDefined()
   @IsMongoId()
-  readonly user: Schema.Types.ObjectId;
+  readonly user_id: Schema.Types.ObjectId;
 
   @IsBoolean()
   readonly creator:boolean;

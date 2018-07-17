@@ -18,10 +18,13 @@ export class ChangeService {
     onModuleInit() { }
 
     async Create(change: CreateChangeDTO): Promise<Change> {
+
+      //TODO should I verify here if the user is actually a collaborator and is authorized to make this change?
+
       const NewChange = new this.changeModel({
-        lineIds: change.lineIds,
-        user: change.user,
-        commit: change.commit,
+        line_ids: change.line_ids,
+        user_id: change.user_id,
+        commit_id: change.commit_id,
         type: change.type,
         data: change.data
       });

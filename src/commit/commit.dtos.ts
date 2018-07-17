@@ -11,7 +11,7 @@ export class CreateCommitDTO {
 
   @IsDefined()
   @IsMongoId()
-  readonly branch: string;
+  readonly branch_id: string;
 }
 
 export class UpdateCommitDTO {

@@ -8,11 +8,11 @@ export class CreateBranchDTO {
 
   @IsDefined()
   @IsMongoId()
-  readonly creator: string;
+  readonly creator_id: string;
 
   @IsDefined()
   @IsMongoId()
-  readonly tree: string;
+  readonly tree_id: string;
 }
 
 export class UpdateBranchDTO {

@@ -5,7 +5,7 @@ export interface User extends Document {
   username: string;
   password: string;
   roles: string[];
-  branches: Schema.Types.ObjectId[];
+  branch_ids: Schema.Types.ObjectId[];
   creation: Date;
   lastOnline: Date;
   banned: boolean;
@@ -25,7 +25,7 @@ export const UserSchema = new Schema({
   roles: {
     type: [{ type: String, enum: ['ADMIN', 'MODERATOR']}]
   },
-  branches: [{
+  branch_ids: [{
     type: Schema.Types.ObjectId,
     ref: 'Branch'
   }],
