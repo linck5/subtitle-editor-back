@@ -2,7 +2,7 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Subtitle } from './subtitle.schema';
-import { compile } from 'ass-compiler';
+import * as assCompiler from 'ass-compiler';
 
 @Injectable()
 // tslint:disable-next-line:component-class-suffix
@@ -15,7 +15,7 @@ export class AssString2SubtitleModelService {
 
     Convert(assStr: string): Subtitle {
 
-      let compiled = compile(assStr);
+      let compiled = assCompiler.compile(assStr);
       let lines = [];
       let id = 0;
 
