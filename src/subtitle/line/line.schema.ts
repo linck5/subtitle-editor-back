@@ -1,11 +1,14 @@
 import { Document, Schema } from 'mongoose';
 
 export interface Line extends Document {
+  id: number;
   startTime:number;
   endTime:number;
   text:string;
-  positionX:number;
-  positionY:number;
+
+  // TODO
+  //positionX:number;
+  //positionY:number;
 }
 
 export const LineSchema = new Schema({
