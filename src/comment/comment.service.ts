@@ -32,8 +32,8 @@ export class CommentService {
       }
 
       switch(comment.type){
-        case 'change': commentObj.change = comment.change; break;
-        case 'commit': commentObj.commit = comment.commit; break;
+        case 'change': commentObj.change_id = comment.change_id; break;
+        case 'commit': commentObj.commit_id = comment.commit_id; break;
       }
 
       commentObj[comment.type] = comment[comment.type];
