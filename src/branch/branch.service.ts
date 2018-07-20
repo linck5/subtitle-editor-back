@@ -1,8 +1,9 @@
 import { Model, PaginateModel, PaginateResult, PaginateOptions,
-  ModelFindByIdAndUpdateOptions } from 'mongoose';
+  ModelUpdateOptions, Schema } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { Branch } from './branch.schema';
 import { Tree } from '../tree/tree.schema';
+import { Commit } from '../commit/commit.schema';
 import { User } from '../user/user.schema';
 import { Collaborator } from './collaborator/collaborator.schema';
 import { CreateBranchDTO, UpdateBranchDTO, ListBranchDTO } from './branch.dtos';
@@ -17,6 +18,7 @@ export class BranchService {
       @InjectModel('Branch') private readonly branchModel: Model<Branch>,
       @InjectModel('Branch') private readonly paginateBranchModel: PaginateModel<Branch>,
       @InjectModel('Tree') private readonly treeModel: Model<Tree>,
+      @InjectModel('Commit') private readonly commitModel: Model<Commit>,
       @InjectModel('User') private readonly userModel: Model<User>,
       @InjectModel('Collaborator') private readonly collaboratorModel: Model<Collaborator>,
       private readonly paginationService: PaginationService
@@ -42,6 +44,7 @@ export class BranchService {
         collaborators: [CreatorAsCollaborator],
         status: "UNMODIFIED",
         deleted: false,
+        tree_id: dto.tree_id,
         // any new branch is created on top of the mainline,
         // so the base commits is the mainline in the current state of
         // this branch's creation
@@ -55,12 +58,46 @@ export class BranchService {
       return await NewBranch.save();
     }
 
-    async Update(id, branch: UpdateBranchDTO): Promise<Branch> {
-      const options:ModelFindByIdAndUpdateOptions = {
+    async Update(id, updateDto: UpdateBranchDTO): Promise<Branch> {
+      const options:ModelUpdateOptions = {
         new: true, // true to return the modified document rather than the original
         runValidators: true
       }
-      return await this.branchModel.findByIdAndUpdate(id, branch, options);
+
+      const branch:Branch = await this.branchModel.findById(id);
+
+      if(updateDto.status == "APPROVED"){
+
+        let tree:Tree = await this.treeModel.findById(branch.tree_id);
+
+        const lastBaseCommit:Commit =
+          await this.commitModel.findById(branch.baseCommit_ids[tree.mainline.length -1])
+
+        const lastBaseBranch:Branch =
+          await this.branchModel.findById(lastBaseCommit.branch_id);
+
+        if(
+            lastBaseBranch.status == "APPROVED" ||
+            lastBaseBranch.status == "MERGED" ||
+            lastBaseBranch.status == "ROOT"
+        ){
+          const branchCommit_ids:Schema.Types.ObjectId[] =
+            (await this.commitModel.find({branch_id: id}))
+            .map(commit => commit._id);
+
+
+          tree.mainline.push(...branchCommit_ids);
+          await tree.save();
+          return await branch.update(updateDto, options);
+        }
+        else{
+          //TODO merge
+          return null;
+        }
+
+      }
+
+
     }
 
     async Delete(id): Promise<Branch> {

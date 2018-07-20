@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { BranchService } from './branch.service';
 import { BranchSchema } from './branch.schema';
 import { TreeSchema } from '../tree/tree.schema';
+import { CommitSchema } from '../commit/commit.schema';
 import { UserSchema } from '../user/user.schema';
 import { CollaboratorSchema } from './collaborator/collaborator.schema';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -14,6 +15,7 @@ import { PaginationService } from '../common/pagination.service';
       MongooseModule.forFeature([
         { name: 'Branch', schema: BranchSchema },
         { name: 'Tree', schema: TreeSchema },
+        { name: 'Commit', schema: CommitSchema },
         { name: 'User', schema: UserSchema },
         { name: 'Collaborator', schema: CollaboratorSchema }
       ])

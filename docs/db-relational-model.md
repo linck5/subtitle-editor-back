@@ -34,7 +34,7 @@ sdtt --> urapp>User requests approval]
 
 ustmnch --> cc
 
-urapp --> sinfin[Set branch field `status` to FINISHED]
+urapp --> sinfin[Set branch field `status` to APPROVED]
 
 
 sinfin --> modapp>Mod approves the branch]
@@ -47,8 +47,8 @@ userfix --> cc
 
 
 
-modapp --> mlempty{<center>is tree<br/> `mainline`<br/> empty?</center>}
-mlempty --> isbolam{<center>is branch<br/> based on last<br/> approved branch?</center>}
+modapp --> mlempty{<center>is branch based<br/> on root branch?</center>}
+mlempty --> isbolam{<center>is branch<br/> based on last<br/> approved/merged branch?</center>}
 
 isbolam -->|no| fnca[Find nearest common ancestor]
 
@@ -79,21 +79,12 @@ pushtoml --> sbfinish[Set branch field `status` to FINISHED]
 ```mermaid
 graph TB
 
-Comment --> Or((or))
-Comment --> User
-
-Or -.-> Commit
-Or -.-> Change
-
 Video -->|"[ ]"| Tree
-
-Tree --> Video
-Tree --> Subtitle
-Tree -->|"mainline [ ]"| Commit
 
 Branch -->|"{[ ]}"| Collaborator
 Branch -->|"base commmits[ ]"| Commit
 Branch -.->|"source"| Branch
+Branch --> Tree
 
 Commit -->|"-i "| Branch
 
@@ -107,6 +98,15 @@ Collaborator --> User
 
 Subtitle -->|"{[ ]}"| Line
 
+Comment --> Or((or))
+Comment --> User
+
+Or -.-> Commit
+Or -.-> Change
+
+Tree --> Video
+Tree --> Subtitle
+Tree -->|"mainline [ ]"| Commit
 
 ```
 
