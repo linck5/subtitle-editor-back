@@ -78,7 +78,10 @@ export class SubtitleService {
 
             switch(change.type){
               case "DELETE":
-                sub.lines.splice(sub.lines.indexOf(targetLine), 1);
+                const indefOfTargetLine = sub.lines.indexOf(targetLine);
+                if(indefOfTargetLine != -1){
+                  sub.lines.splice(indefOfTargetLine, 1);
+                }
                 break;
               case "EDIT":
                 for(const prop of ["startTime", "endTime", "text"]){
