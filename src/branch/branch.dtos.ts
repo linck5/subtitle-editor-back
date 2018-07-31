@@ -2,7 +2,8 @@
 import { IsString, IsInt, IsBoolean, ValidateNested, IsMongoId, IsDefined } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
-import { UpdateBranchCollaboratorDTO } from './collaborator/collaborator.dtos'
+import { UpdateBranchCollaboratorDTO } from './collaborator/collaborator.dtos';
+import { ResolvedRebaseDTO } from './rebasing/rebase.dtos';
 
 export class CreateBranchDTO {
 
@@ -22,6 +23,10 @@ export class UpdateBranchDTO {
 
   @IsBoolean()
   readonly deleted: boolean;
+
+  @ValidateNested()
+  @Type(() => ResolvedRebaseDTO)
+  readonly resolvedRebase: ResolvedRebaseDTO;
 
   @ValidateNested({ each: true })
   @Type(() => UpdateBranchCollaboratorDTO)

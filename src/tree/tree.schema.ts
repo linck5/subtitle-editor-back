@@ -6,8 +6,8 @@ export interface Tree extends Document {
   language: string;
   video_id: Schema.Types.ObjectId;
   subtitle_id:Schema.Types.ObjectId;
-  mainline:Schema.Types.ObjectId[];
   creation: Date;
+  mainlineLength: number;
 }
 
 export const TreeSchema = new Schema({
@@ -29,13 +29,15 @@ export const TreeSchema = new Schema({
     ref: 'Subtitle',
     required: true
   },
-  mainline: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Commit'
-  }],
   creation: {
     type: Date,
     default: Date.now()
+  },
+  mainlineLength: {
+    type: Number,
+    required: true,
+    get: v => Math.round(v),
+    set: v => Math.round(v)
   }
 
 });

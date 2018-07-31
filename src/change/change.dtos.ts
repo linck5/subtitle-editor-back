@@ -1,5 +1,5 @@
 
-import { IsString, IsInt, IsUrl, IsMongoId, ValidateNested, IsNumber, IsDefined
+import { IsString, IsInt, IsDate, IsMongoId, ValidateNested, IsNumber, IsDefined
  } from 'class-validator';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 import { Schema } from 'mongoose';
@@ -23,9 +23,46 @@ export class CreateChangeDTO {
   readonly commit_id: Schema.Types.ObjectId;
 
   @IsDefined()
+  @IsMongoId()
+  readonly branch_id: Schema.Types.ObjectId;
+
+  @IsDefined()
   @IsString()
   readonly type: string;
 
+
+  @ValidateNested()
+  @Type(() => ChangeDataDTO)
+  readonly data: ChangeDataDTO;
+
+}
+
+
+export class RebasedChangeDTO {
+
+  @IsDefined()
+  @IsInt({each: true})
+  readonly line_ids: number[];
+
+  @IsDefined()
+  @IsMongoId()
+  readonly user_id: Schema.Types.ObjectId;
+
+  @IsDefined()
+  @IsMongoId()
+  readonly commit_id: Schema.Types.ObjectId;
+
+  @IsDefined()
+  @IsMongoId()
+  readonly branch_id: Schema.Types.ObjectId;
+
+  @IsDefined()
+  @IsString()
+  readonly type: string;
+
+  @IsDefined()
+  @IsDate()
+  readonly creation: Date;
 
   @ValidateNested()
   @Type(() => ChangeDataDTO)
@@ -62,6 +99,9 @@ export class ChangeDataDTO {
 
   @IsString()
   readonly text: string;
+
+  @IsNumber()
+  readonly timeShift: number;
 
   //position? //TODO
 }

@@ -36,7 +36,8 @@ export class TreeService {
         collaborators: [],
         status: "ROOT",
         deleted: false,
-        baseCommit_ids: null
+        isInMainline: true,
+        mlBaseIndex: -1
       });
       await NewBranch.save();
 
@@ -54,7 +55,7 @@ export class TreeService {
         description: tree.description,
         video_id: tree.video_id,
         subtitle_id: tree.subtitle_id,
-        mainline: [NewCommit._id]
+        mainlineLength: 1
       });
 
       //put a reference to the tree in the video
@@ -62,8 +63,9 @@ export class TreeService {
       TreeVideo.tree_ids.push(NewTree._id);
       TreeVideo.save();
 
+      await NewTree.save();
 
-      return await NewTree.save();
+      return NewTree;
 
     }
 

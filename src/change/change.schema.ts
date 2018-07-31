@@ -1,12 +1,12 @@
 import { Document, Schema } from 'mongoose';
 import { User } from '../user/user.schema';
-import { Commit } from '../commit/commit.schema';
 var mongoosePaginate = require('mongoose-paginate');
 
 export interface Change extends Document {
   line_ids: number[];
   user_id: User;
-  commit_id: Commit;
+  commit_id: Schema.Types.ObjectId;
+  branch_id: Schema.Types.ObjectId;
   creation: Date;
   type: string;
   data: {
@@ -32,6 +32,12 @@ export const ChangeSchema = new Schema({
   commit_id: {
     type: Schema.Types.ObjectId,
     ref: 'Commit',
+    required: true,
+    index: true
+  },
+  branch_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'Branch',
     required: true,
     index: true
   },
