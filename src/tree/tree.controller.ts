@@ -58,4 +58,24 @@ export class TreeController {
       }, HttpStatus.BAD_REQUEST);
     });
   }
+
+  @Delete('/trees')
+  async DropCollection() {
+
+    if(process.env.TEST_ENV){
+      return await this.treeService.Drop()
+      .catch(err => {
+        throw new HttpException({
+          error: err
+        }, HttpStatus.BAD_REQUEST);
+      });
+    }
+    else{
+      throw new HttpException({
+        error: "Server is not on a test environment"
+      }, HttpStatus.BAD_REQUEST);
+    }
+
+  }
+
 }

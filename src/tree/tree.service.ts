@@ -5,6 +5,10 @@ import { Tree } from './tree.schema';
 import { Commit } from '../commit/commit.schema';
 import { Branch } from '../branch/branch.schema';
 import { Video } from '../video/video.schema';
+import { Change } from '../change/change.schema';
+import { Rebase } from '../branch/rebasing/rebase.schema';
+import { Comment } from '../comment/comment.schema';
+import { User } from '../user/user.schema';
 import { CreateTreeDTO, UpdateTreeDTO, ListTreeDTO } from './tree.dtos';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginationService } from '../common/pagination.service';
@@ -17,9 +21,13 @@ export class TreeService {
     constructor(
       @InjectModel('Tree') private readonly treeModel: Model<Tree>,
       @InjectModel('Tree') private readonly paginateTreeModel: PaginateModel<Tree>,
+      @InjectModel('Change') private readonly changeModel: Model<Change>,
       @InjectModel('Commit') private readonly commitModel: Model<Commit>,
       @InjectModel('Branch') private readonly branchModel: Model<Branch>,
+      @InjectModel('Rebase') private readonly rebaseModel: Model<Rebase>,
+      @InjectModel('Comment') private readonly commentModel: Model<Comment>,
       @InjectModel('Video') private readonly videoModel: Model<Video>,
+      @InjectModel('User') private readonly userModel: Model<User>,
       private readonly paginationService: PaginationService
     ) { }
 
@@ -78,7 +86,39 @@ export class TreeService {
     }
 
     async Delete(id): Promise<Tree> {
+      //TODO also clean up all related data
+
       return await this.treeModel.findByIdAndRemove(id);
+    }
+
+    async Drop(): Promise<any> {
+
+      //have to check if each collection exists otherwise mongo will throw an error
+
+      console.log("wipping all trees and related data...")
+
+      if(await this.commentModel.count({}) != 0){
+        await this.commentModel.collection.drop();
+      }
+      if(await this.changeModel.count({}) != 0){
+        await this.changeModel.collection.drop();
+      }
+      if(await this.commitModel.count({}) != 0){
+        await this.commitModel.collection.drop();
+      }
+      if(await this.rebaseModel.count({}) != 0){
+        await this.rebaseModel.collection.drop();
+      }
+      if(await this.branchModel.count({}) != 0){
+        await this.userModel.updateMany({},  { branch_ids: [] });
+        await this.branchModel.collection.drop();
+      }
+      if(await this.treeModel.count({}) != 0){
+        await this.videoModel.updateMany({}, { tree_ids: [] });
+        return await this.treeModel.collection.drop();
+      }
+      else return null;
+
     }
 
     async GetById(id): Promise<Tree> {
