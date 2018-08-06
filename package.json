@@ -15,7 +15,6 @@
     "@nestjs/core": "^5.0.1",
     "@nestjs/microservices": "^5.0.1",
     "@nestjs/mongoose": "^5.0.0",
-    "@nestjs/testing": "^5.0.1",
     "@nestjs/websockets": "^5.0.1",
     "ass-compiler": "0.0.9",
     "bcrypt": "^1.0.3",
@@ -38,6 +37,7 @@
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
+    "@nestjs/testing": "^5.1.0",
     "@types/bcrypt": "^1.0.0",
     "@types/body-parser": "^1.17.0",
     "@types/cors": "^2.8.4",
@@ -66,7 +66,7 @@
     "npm-run-all": "^4.1.2",
     "protractor": "~5.1.2",
     "ts-loader": "^2.3.7",
-    "ts-node": "~3.2.0",
+    "ts-node": "^3.2.2",
     "tslint": "~5.7.0",
     "typescript": "^2.9.1"
   }
