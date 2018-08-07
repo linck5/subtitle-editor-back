@@ -1,6 +1,6 @@
 
-import { IsString, IsInt, IsDate, IsMongoId, ValidateNested, IsNumber, IsDefined
- } from 'class-validator';
+import { IsString, IsInt, IsDate, IsMongoId, ValidateNested, IsNumber,
+  IsDefined, Matches } from 'class-validator';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 import { Schema } from 'mongoose';
 import { Type } from 'class-transformer';
@@ -28,6 +28,7 @@ export class CreateChangeDTO {
 
   @IsDefined()
   @IsString()
+  @Matches(/(?:CREATE)|(?:EDIT)|(?:TIME_SHIFT)|(?:DELETE)/)
   readonly type: string;
 
 
@@ -92,16 +93,17 @@ export const changeOrderByParams =
 export class ChangeDataDTO {
 
   @IsNumber()
-  readonly startTime: number;
+  readonly startTime: number; //milliseconds
 
   @IsNumber()
-  readonly endTime: number;
+  readonly endTime: number; //milliseconds
 
   @IsString()
   readonly text: string;
 
+
   @IsNumber()
-  readonly timeShift: number;
+  readonly timeShift: number; //milliseconds
 
   //position? //TODO
 }

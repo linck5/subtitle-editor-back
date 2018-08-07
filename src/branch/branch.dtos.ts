@@ -1,5 +1,6 @@
 
-import { IsString, IsInt, IsBoolean, ValidateNested, IsMongoId, IsDefined } from 'class-validator';
+import { IsString, IsInt, IsBoolean, ValidateNested, IsMongoId, IsDefined,
+Matches } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 import { UpdateBranchCollaboratorDTO } from './collaborator/collaborator.dtos';
@@ -19,6 +20,7 @@ export class CreateBranchDTO {
 export class UpdateBranchDTO {
 
   @IsString()
+  @Matches(/(?:IN_PROGRESS)|(?:FINISHED)|(?:APPROVED)/)
   readonly status: string;
 
   @IsBoolean()
