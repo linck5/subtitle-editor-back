@@ -144,7 +144,6 @@ export class BranchService {
 
     async Approve(branch:Branch, resolvedRebase?:Rebase): Promise<ApproveResponse>{
 
-
       let tree:Tree = await this.treeModel.findById(branch.tree_id);
 
       const pendingRebase:Rebase =
@@ -171,7 +170,7 @@ export class BranchService {
         }
       }
       //check if the branch is based on the mainline leaf branch
-      if(branch.mainlineBaseIndex == tree.mainlineLength - 1){
+      if(branch.mlBaseIndex == tree.mainlineLength - 1){
         branch.status = "APPROVED";
         branch.isInMainline = true;
         await branch.save();

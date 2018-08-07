@@ -20,7 +20,7 @@ export interface Branch extends Document {
   //This is used for:
   //1- finding all the branches in the mainline and sorting them
   //2- see on which branch a branch outside the mainline is based on (for merging)
-  mainlineBaseIndex: number;
+  mlBaseIndex: number;
 
 }
 

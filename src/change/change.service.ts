@@ -24,6 +24,7 @@ export class ChangeService {
       const NewChange = new this.changeModel({
         line_ids: change.line_ids,
         user_id: change.user_id,
+        branch_id: change.branch_id,
         commit_id: change.commit_id,
         type: change.type,
         data: change.data
