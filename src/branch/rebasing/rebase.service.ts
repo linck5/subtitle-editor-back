@@ -51,7 +51,7 @@ export class RebaseService {
     const targetLineIds:Schema.Types.ObjectId[] =
       (await this.branchModel.find({
         tree_id: tree._id,
-        mlBaseIndex: {$gt: sourceBranch.mainlineBaseIndex},
+        mlBaseIndex: {$gt: sourceBranch.mlBaseIndex},
         isInMainline: true
       }))
       .map(doc => doc._id);
