@@ -54,7 +54,6 @@ export const BranchSchema = new Schema({
   mlBaseIndex: {
     type: Number,
     required: true,
-    unique: true,
     get: v => Math.round(v),
     set: v => Math.round(v)
   }
