@@ -7,7 +7,26 @@
   },
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --watch ./src --exec ts-node ./index.ts"
+    "start": "nodemon --watch ./src --exec ts-node ./index.ts",
+    "test": "jest"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ],
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   },
   "dependencies": {
     "@angular/core": "^6.0.4",
@@ -47,24 +66,29 @@
     "@types/express-jwt": "0.0.38",
     "@types/jasmine": "~2.5.53",
     "@types/jasminewd2": "~2.0.2",
+    "@types/jest": "^23.3.1",
     "@types/jsonwebtoken": "^7.2.3",
     "@types/mongodb": "^2.2.16",
-    "@types/mongoose": "^4.7.28",
+    "@types/mongoose": "^4.7.39",
     "@types/mongoose-paginate": "^5.0.6",
     "@types/node": "~6.0.60",
     "@types/passport-jwt": "^3.0.0",
     "codelyzer": "~3.2.0",
     "jasmine-core": "~2.6.2",
     "jasmine-spec-reporter": "~4.1.0",
+    "jest": "^23.5.0",
     "karma": "~1.7.0",
     "karma-chrome-launcher": "~2.1.1",
     "karma-cli": "~1.0.1",
     "karma-coverage-istanbul-reporter": "^1.2.1",
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "mockgoose-fix": "^7.3.6",
     "nodemon": "^1.12.1",
     "npm-run-all": "^4.1.2",
     "protractor": "~5.1.2",
+    "supertest": "^3.1.0",
+    "ts-jest": "^23.0.1",
     "ts-loader": "^2.3.7",
     "ts-node": "^3.2.2",
     "tslint": "~5.7.0",
