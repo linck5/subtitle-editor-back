@@ -1,6 +1,6 @@
 import { Model, PaginateModel, PaginateResult, PaginateOptions,
   ModelFindByIdAndUpdateOptions } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Tree } from './tree.schema';
 import { Commit } from '../commit/commit.schema';
 import { Branch } from '../branch/branch.schema';
@@ -10,7 +10,7 @@ import { Rebase } from '../branch/rebasing/rebase.schema';
 import { Comment } from '../comment/comment.schema';
 import { User } from '../user/user.schema';
 import { CreateTreeDTO, UpdateTreeDTO, ListTreeDTO } from './tree.dtos';
-import { InjectModel } from '@nestjs/mongoose';
+
 import { PaginationService } from '../common/pagination.service';
 
 
@@ -19,15 +19,15 @@ import { PaginationService } from '../common/pagination.service';
 export class TreeService {
 
     constructor(
-      @InjectModel('Tree') private readonly treeModel: Model<Tree>,
-      @InjectModel('Tree') private readonly paginateTreeModel: PaginateModel<Tree>,
-      @InjectModel('Change') private readonly changeModel: Model<Change>,
-      @InjectModel('Commit') private readonly commitModel: Model<Commit>,
-      @InjectModel('Branch') private readonly branchModel: Model<Branch>,
-      @InjectModel('Rebase') private readonly rebaseModel: Model<Rebase>,
-      @InjectModel('Comment') private readonly commentModel: Model<Comment>,
-      @InjectModel('Video') private readonly videoModel: Model<Video>,
-      @InjectModel('User') private readonly userModel: Model<User>,
+      @Inject('Tree') private readonly treeModel: Model<Tree>,
+      @Inject('Tree') private readonly paginateTreeModel: PaginateModel<Tree>,
+      @Inject('Change') private readonly changeModel: Model<Change>,
+      @Inject('Commit') private readonly commitModel: Model<Commit>,
+      @Inject('Branch') private readonly branchModel: Model<Branch>,
+      @Inject('Rebase') private readonly rebaseModel: Model<Rebase>,
+      @Inject('Comment') private readonly commentModel: Model<Comment>,
+      @Inject('Video') private readonly videoModel: Model<Video>,
+      @Inject('User') private readonly userModel: Model<User>,
       private readonly paginationService: PaginationService
     ) { }
 

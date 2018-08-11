@@ -1,8 +1,8 @@
 import { Model, PaginateModel, PaginateResult } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Change } from './change.schema';
 import { CreateChangeDTO, ListChangeDTO } from './change.dtos';
-import { InjectModel } from '@nestjs/mongoose';
+
 import { PaginationService } from '../common/pagination.service';
 
 @Injectable()
@@ -10,8 +10,8 @@ import { PaginationService } from '../common/pagination.service';
 export class ChangeService {
 
     constructor(
-      @InjectModel('Change') private readonly changeModel: Model<Change>,
-      @InjectModel('Change') private readonly paginateChangeModel: PaginateModel<Change>,
+      @Inject('Change') private readonly changeModel: Model<Change>,
+      @Inject('Change') private readonly paginateChangeModel: PaginateModel<Change>,
       private readonly paginationService: PaginationService
     ) { }
 

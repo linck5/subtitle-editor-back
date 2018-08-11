@@ -1,15 +1,18 @@
 import { Module } from '@nestjs/common';
 import { ChangeService } from './change.service';
 import { ChangeSchema } from './change.schema';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ChangeController } from './change.controller';
 import { PaginationService } from '../common/pagination.service';
+import { DatabaseModule } from '../database/database.module';
+import { getCollectionProvider } from '../database/database.providers';
 
 @Module({
-    imports: [
-      MongooseModule.forFeature([{ name: 'Change', schema: ChangeSchema }])
+    imports: [DatabaseModule],
+    providers: [
+      getCollectionProvider(ChangeSchema, "Change"),
+      ChangeService,
+      PaginationService
     ],
-    providers: [ChangeService, PaginationService],
     controllers: [ChangeController],
     exports: [ChangeService]
 })

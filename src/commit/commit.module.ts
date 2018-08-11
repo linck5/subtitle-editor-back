@@ -1,15 +1,18 @@
 import { Module } from '@nestjs/common';
 import { CommitService } from './commit.service';
 import { CommitSchema } from './commit.schema';
-import { MongooseModule } from '@nestjs/mongoose';
 import { CommitController } from './commit.controller';
 import { PaginationService } from '../common/pagination.service';
+import { DatabaseModule } from '../database/database.module';
+import { getCollectionProvider } from '../database/database.providers';
 
 @Module({
-    imports: [
-      MongooseModule.forFeature([{ name: 'Commit', schema: CommitSchema }])
+    imports: [DatabaseModule],
+    providers: [
+      getCollectionProvider(CommitSchema, "Commit"),
+      CommitService,
+      PaginationService
     ],
-    providers: [CommitService, PaginationService],
     controllers: [CommitController],
     exports: [CommitService]
 })

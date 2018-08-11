@@ -1,16 +1,19 @@
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserSchema } from './user.schema';
-import { MongooseModule } from '@nestjs/mongoose';
 import { UserController } from './user.controller';
 import { PaginationService } from '../common/pagination.service';
+import { DatabaseModule } from '../database/database.module';
+import { getCollectionProvider } from '../database/database.providers';
 
 
 @Module({
-    imports: [
-      MongooseModule.forFeature([{ name: 'User', schema: UserSchema }])
+    imports: [DatabaseModule],
+    providers: [
+      getCollectionProvider(UserSchema, "User"),
+      UserService,
+      PaginationService
     ],
-    providers: [UserService, PaginationService],
     controllers: [UserController],
     exports: [UserService]
 })

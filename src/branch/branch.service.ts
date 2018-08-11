@@ -1,6 +1,6 @@
 import { Model, PaginateModel, PaginateResult, PaginateOptions,
   ModelUpdateOptions, Schema } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Branch } from './branch.schema';
 import { Tree } from '../tree/tree.schema';
 import { User } from '../user/user.schema';
@@ -10,7 +10,7 @@ import { Rebase } from './rebasing/rebase.schema';
 import { RebaseService } from './rebasing/rebase.service';
 import { Collaborator } from './collaborator/collaborator.schema';
 import { CreateBranchDTO, UpdateBranchDTO, ListBranchDTO } from './branch.dtos';
-import { InjectModel } from '@nestjs/mongoose';
+
 import { PaginationService } from '../common/pagination.service';
 
 @Injectable()
@@ -18,13 +18,13 @@ import { PaginationService } from '../common/pagination.service';
 export class BranchService {
 
     constructor(
-      @InjectModel('Branch') private readonly branchModel: Model<Branch>,
-      @InjectModel('Branch') private readonly paginateBranchModel: PaginateModel<Branch>,
-      @InjectModel('Tree') private readonly treeModel: Model<Tree>,
-      @InjectModel('Commit') private readonly commitModel: Model<Commit>,
-      @InjectModel('Change') private readonly changeModel: Model<Change>,
-      @InjectModel('User') private readonly userModel: Model<User>,
-      @InjectModel('Collaborator') private readonly collaboratorModel: Model<Collaborator>,
+      @Inject('Branch') private readonly branchModel: Model<Branch>,
+      @Inject('Branch') private readonly paginateBranchModel: PaginateModel<Branch>,
+      @Inject('Tree') private readonly treeModel: Model<Tree>,
+      @Inject('Commit') private readonly commitModel: Model<Commit>,
+      @Inject('Change') private readonly changeModel: Model<Change>,
+      @Inject('User') private readonly userModel: Model<User>,
+      @Inject('Collaborator') private readonly collaboratorModel: Model<Collaborator>,
       private readonly paginationService: PaginationService,
       private readonly rebaseService: RebaseService
     ) { }

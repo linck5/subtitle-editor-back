@@ -1,9 +1,9 @@
 import { Model, PaginateModel, PaginateResult, PaginateOptions,
   ModelFindByIdAndUpdateOptions } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Commit } from './commit.schema';
 import { CreateCommitDTO, UpdateCommitDTO, ListCommitDTO } from './commit.dtos';
-import { InjectModel } from '@nestjs/mongoose';
+
 import { PaginationService } from '../common/pagination.service';
 
 
@@ -12,8 +12,8 @@ import { PaginationService } from '../common/pagination.service';
 export class CommitService {
 
     constructor(
-      @InjectModel('Commit') private readonly commitModel: Model<Commit>,
-      @InjectModel('Commit') private readonly paginateCommitModel: PaginateModel<Commit>,
+      @Inject('Commit') private readonly commitModel: Model<Commit>,
+      @Inject('Commit') private readonly paginateCommitModel: PaginateModel<Commit>,
       private readonly paginationService: PaginationService
     ) { }
 

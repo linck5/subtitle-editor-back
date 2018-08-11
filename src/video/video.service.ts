@@ -1,9 +1,9 @@
 import { Model, PaginateModel, PaginateResult, PaginateOptions,
   ModelFindByIdAndUpdateOptions } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Video } from './video.schema';
 import { CreateVideoDTO, UpdateVideoDTO, ListVideoDTO } from './video.dtos';
-import { InjectModel } from '@nestjs/mongoose';
+
 import { PaginationService } from '../common/pagination.service';
 
 @Injectable()
@@ -11,8 +11,8 @@ import { PaginationService } from '../common/pagination.service';
 export class VideoService {
 
     constructor(
-      @InjectModel('Video') private readonly videoModel: Model<Video>,
-      @InjectModel('Video') private readonly paginateVideoModel: PaginateModel<Video>,
+      @Inject('Video') private readonly videoModel: Model<Video>,
+      @Inject('Video') private readonly paginateVideoModel: PaginateModel<Video>,
       private readonly paginationService: PaginationService
     ) { }
 

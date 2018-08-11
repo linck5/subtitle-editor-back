@@ -1,7 +1,6 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { CreateSubtitleDTO } from './subtitle.dtos';
-import { InjectModel } from '@nestjs/mongoose';
 import { Subtitle } from './subtitle.schema';
 import { Line } from './line/line.schema';
 import { Change } from '../change/change.schema';
@@ -12,9 +11,8 @@ import { AssString2SubtitleModelService } from './assConverter.service';
 export class SubtitleService {
 
     constructor(
-      @InjectModel('Subtitle') private readonly subtitleModel: Model<Subtitle>,
-      @InjectModel('Line') private readonly lineModel: Model<Line>,
-      @InjectModel('Change') private readonly changeModel: Model<Change>,
+      @Inject('Subtitle') private readonly subtitleModel: Model<Subtitle>,
+      @Inject('Line') private readonly lineModel: Model<Line>,
       private readonly assString2SubtitleModel: AssString2SubtitleModelService
     ) { }
 

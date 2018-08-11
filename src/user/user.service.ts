@@ -1,9 +1,9 @@
 import { Model, PaginateModel, PaginateResult, PaginateOptions,
   ModelFindByIdAndUpdateOptions } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { User } from './user.schema';
 import { CreateUserDTO, UpdateUserDTO, ListUserDTO } from './user.dtos';
-import { InjectModel } from '@nestjs/mongoose';
+
 import { genSaltSync, hashSync } from 'bcrypt';
 import { PaginationService } from '../common/pagination.service';
 
@@ -13,8 +13,8 @@ import { PaginationService } from '../common/pagination.service';
 export class UserService {
 
     constructor(
-      @InjectModel('User') private readonly userModel: Model<User>,
-      @InjectModel('User') private readonly paginateUserModel: PaginateModel<User>,
+      @Inject('User') private readonly userModel: Model<User>,
+      @Inject('User') private readonly paginateUserModel: PaginateModel<User>,
       private readonly paginationService: PaginationService
     ) { }
 

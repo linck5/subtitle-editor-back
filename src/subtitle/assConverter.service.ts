@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, Inject } from '@nestjs/common';
+
 import { Subtitle } from './subtitle.schema';
 import * as assCompiler from 'ass-compiler';
 
@@ -9,7 +9,7 @@ import * as assCompiler from 'ass-compiler';
 export class AssString2SubtitleModelService {
 
     constructor(
-      @InjectModel('Subtitle') private readonly subtitleModel: Model<Subtitle>
+      @Inject('Subtitle') private readonly subtitleModel: Model<Subtitle>
     ) { }
 
 

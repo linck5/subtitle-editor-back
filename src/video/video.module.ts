@@ -1,15 +1,18 @@
 import { Module } from '@nestjs/common';
 import { VideoService } from './video.service';
 import { VideoSchema } from './video.schema';
-import { MongooseModule } from '@nestjs/mongoose';
 import { VideoController } from './video.controller';
 import { PaginationService } from '../common/pagination.service';
+import { DatabaseModule } from '../database/database.module';
+import { getCollectionProvider } from '../database/database.providers';
 
 @Module({
-    imports: [
-      MongooseModule.forFeature([{ name: 'Video', schema: VideoSchema }])
+    imports: [DatabaseModule],
+    providers: [
+      getCollectionProvider(VideoSchema, "Video"),
+      VideoService,
+      PaginationService
     ],
-    providers: [VideoService, PaginationService],
     controllers: [VideoController],
     exports: [VideoService]
 })

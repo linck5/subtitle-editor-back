@@ -1,9 +1,9 @@
 import { Model, PaginateModel, PaginateResult,
   ModelFindByIdAndUpdateOptions } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Comment } from './comment.schema';
 import { CreateCommentDTO, UpdateCommentDTO, ListCommentDTO } from './comment.dtos';
-import { InjectModel } from '@nestjs/mongoose';
+
 import { PaginationService } from '../common/pagination.service';
 
 
@@ -12,8 +12,8 @@ import { PaginationService } from '../common/pagination.service';
 export class CommentService {
 
     constructor(
-      @InjectModel('Comment') private readonly commentModel: Model<Comment>,
-      @InjectModel('Comment') private readonly paginateCommentModel: PaginateModel<Comment>,
+      @Inject('Comment') private readonly commentModel: Model<Comment>,
+      @Inject('Comment') private readonly paginateCommentModel: PaginateModel<Comment>,
       private readonly paginationService: PaginationService
     ) { }
 

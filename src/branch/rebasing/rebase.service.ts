@@ -1,20 +1,20 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { Rebase, RebaseData, Conflict } from './rebase.schema';
 import { ResolvedRebaseDTO } from './rebase.dtos';
 import { Branch } from '../branch.schema';
 import { Tree } from '../../tree/tree.schema';
 import { Model, Schema } from 'mongoose';
 import { Change } from '../../change/change.schema';
-import { InjectModel } from '@nestjs/mongoose';
+
 
 @Injectable()
 export class RebaseService {
 
   constructor(
-    @InjectModel('Rebase') private readonly rebaseModel: Model<Rebase>,
-    @InjectModel('Tree') private readonly treeModel: Model<Tree>,
-    @InjectModel('Branch') private readonly branchModel: Model<Branch>,
-    @InjectModel('Change') private readonly changeModel: Model<Change>
+    @Inject('Rebase') private readonly rebaseModel: Model<Rebase>,
+    @Inject('Tree') private readonly treeModel: Model<Tree>,
+    @Inject('Branch') private readonly branchModel: Model<Branch>,
+    @Inject('Change') private readonly changeModel: Model<Change>
   ) { }
 
 
