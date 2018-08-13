@@ -2,17 +2,12 @@ import * as mongoose from 'mongoose';
 import { Connection, Schema } from 'mongoose';
 import { Mockgoose } from 'mockgoose-fix';
 
-export const getCollectionProvider = (schema:Schema, collectionName:string)=>{
-  return {
-    provide: collectionName,
-    useFactory: (connection: Connection) => connection.model(collectionName, schema),
-    inject: ['DbConnectionToken'],
-  }
-}
+const dbToken:string = 'DbConnectionToken';
+
 
 export const databaseProviders = [
   {
-    provide: 'DbConnectionToken',
+    provide: dbToken,
     useFactory: async () => {
       (mongoose as any).Promise = global.Promise;
 
@@ -23,7 +18,8 @@ export const databaseProviders = [
 
         mockgoose.prepareStorage()
           .then(async () => {
-            await mongoose.connect(process.env.DB_CONN);
+            //mockgoose intercepts mongoose.connect() and creates an empty local mongod
+            await mongoose.connect('');
           });
       }
 
@@ -36,12 +32,10 @@ export const databaseProviders = [
   },
 ];
 
-export const dsd = [
-  {
-    provide: 'DbConnectionToken',
-    useFactory: async (): Promise<typeof mongoose> => {
-      return await mongoose.connect(process.env.DB_CONN)
-    }
-
-  },
-];
+export const getCollectionProvider = (schema:Schema, collectionName:string)=>{
+  return {
+    provide: collectionName,
+    useFactory: (connection: Connection) => connection.model(collectionName, schema),
+    inject: [dbToken],
+  }
+}
