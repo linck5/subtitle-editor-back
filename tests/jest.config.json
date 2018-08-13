@@ -1,0 +1,21 @@
+{
+  "rootDir": "../",
+  "testEnvironment": "node",
+  "globalSetup": "<rootDir>/tests/globalSetup_hook.js",
+  "transform": {
+    "^.+\\.tsx?$": "ts-jest"
+  },
+  "testPathIgnorePatterns": [
+    "/node_modules/",
+    "/dist/"
+  ],
+  "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+  "moduleFileExtensions": [
+    "ts",
+    "tsx",
+    "js",
+    "jsx",
+    "json",
+    "node"
+  ]
+}

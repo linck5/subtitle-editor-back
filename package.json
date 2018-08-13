@@ -8,25 +8,7 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon --watch ./src --exec ts-node ./index.ts",
-    "test": "jest"
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/dist/"
-    ],
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
+    "test": "jest --config ./tests/jest.config.json"
   },
   "dependencies": {
     "@angular/core": "^6.0.4",
