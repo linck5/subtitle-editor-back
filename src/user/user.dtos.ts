@@ -1,6 +1,6 @@
 
-import { IsString, IsInt, MinLength, IsAscii, IsBoolean, IsDate, IsDefined
- } from 'class-validator';
+import { IsString, IsInt, MinLength, IsAscii, IsBoolean, IsDate, IsDefined,
+Matches } from 'class-validator';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 
 export class AuthUserDTO {
@@ -34,6 +34,7 @@ export class CreateUserDTO {
   readonly password: string;
 
   @IsString({each: true})
+  @Matches(/(?:MODERATOR)|(?:ADMIN)/, {each: true})
   readonly roles: string[];
 
   @IsBoolean()
