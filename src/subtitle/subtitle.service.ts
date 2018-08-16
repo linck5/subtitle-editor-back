@@ -17,9 +17,24 @@ export class SubtitleService {
     ) { }
 
     async Create(subtitle: CreateSubtitleDTO): Promise<Subtitle> {
+
+      let lines = []
+      let lastId = -1;
+
+      for(let line of subtitle.lines){
+        lines.push(new this.lineModel({
+          id: ++lastId,
+          startTime: line.startTime,
+          endTime: line.endTime,
+          text: line.text
+        }))
+      }
+
+
+
       const NewSubtitle = new this.subtitleModel({
-        lines: subtitle.lines,
-        lastId: subtitle.lines.length -1
+        lines: lines,
+        lastId: lastId
       });
       return await NewSubtitle.save();
     }
