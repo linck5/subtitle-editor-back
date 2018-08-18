@@ -4,7 +4,7 @@ var mongoosePaginate = require('mongoose-paginate');
 
 export interface Change extends Document {
   line_ids: number[];
-  user_id: User;
+  user_id: Schema.Types.ObjectId;
   commit_id: Schema.Types.ObjectId;
   branch_id: Schema.Types.ObjectId;
   creation: Date;

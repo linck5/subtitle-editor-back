@@ -27,7 +27,7 @@ export const RebaseSchema = new Schema({
     required: true
   },
   targetLineBranch_ids: {
-    type: Schema.Types.ObjectId,
+    type: [Schema.Types.ObjectId],
     ref: 'Branch',
     required: true
   },
@@ -37,7 +37,7 @@ export const RebaseSchema = new Schema({
     required: true
   },
   rebaseData: {
-    type: [Object],
+    type: [Schema.Types.Mixed],
     required: true
   },
   conflictsStatus: {
