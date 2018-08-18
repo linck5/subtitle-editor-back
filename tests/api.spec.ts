@@ -33,7 +33,7 @@ describe('Api Tests', () => {
 
   describe('Insert some test data on mock db', () => {
 
-    it('should /POST some users', async () => {
+    it("should /POST some users", async () => {
       let res1 = await request(server)
         .post('/users')
         .send({
@@ -57,7 +57,7 @@ describe('Api Tests', () => {
 
     });
 
-    it('should /POST some videos', async () => {
+    it("should /POST some videos", async () => {
       let res1 = await request(server)
         .post('/videos')
         .send({
@@ -78,8 +78,8 @@ describe('Api Tests', () => {
         })
         .expect(201);
 
-      testData.videos.video1 = res1;
-      testData.videos.video2 = res2;
+      testData.videos.video1 = res1.body;
+      testData.videos.video2 = res2.body;
     });
 
 
@@ -121,7 +121,247 @@ describe('Api Tests', () => {
 
         expect(res.body.lastId).toBe(472);
 
-        testData.subtitles.subtitle1 = res;
+        testData.subtitles.subtitle1 = res.body;
+    });
+  });
+
+  describe('Simulate the API flow', () => {
+
+    let workingData = {
+      tree1: null,
+      branch1t1: null,
+      commit1b1t1: null,
+      change1c1b1t1: null,
+      branch2t1: null,
+      commit1b2t1: null,
+      change1c1b2t1: null
+    }
+
+    describe("tree creation and first branch with a commit and a change", ()=>{
+
+      it(`should /POST a tree`, async () => {
+
+        let res = await request(server)
+          .post("/trees")
+          .send({
+            language: "jp",
+            description: "a test tree",
+            video_id: testData.videos.video2._id,
+            subtitle_id: testData.subtitles.subtitle1._id
+          })
+          .expect(201);
+
+        workingData.tree1 = res.body;
+
+      });
+
+      it("should /POST a branch", async () => {
+
+
+        let res = await request(server)
+          .post("/branches")
+          .send({
+            creator_id: testData.users.user1._id,
+            tree_id: workingData.tree1._id
+          })
+          .expect(201);
+
+        workingData.branch1t1 = res.body;
+
+      });
+
+      it("should /POST a commit", async () => {
+
+        let res = await request(server)
+          .post("/commits")
+          .send({
+            description: "",
+            branch_id: workingData.branch1t1._id
+          })
+          .expect(201);
+
+        workingData.commit1b1t1 = res.body;
+
+      });
+
+      it("should /POST a change", async () => {
+
+        let res = await request(server)
+          .post("/changes")
+          .send({
+            line_ids: [5],
+            user_id: testData.users.user1._id,
+            commit_id: workingData.commit1b1t1._id,
+            branch_id: workingData.branch1t1._id,
+            type: "EDIT",
+            data: {
+              text: "普通な漢字"
+            }
+          })
+          .expect(201);
+
+        workingData.change1c1b1t1 = res.body;
+
+      });
+    });
+
+    describe("Finishing and approving another branch",()=>{
+
+      it("should /POST a branch", async () => {
+
+
+        let res = await request(server)
+          .post("/branches")
+          .send({
+            creator_id: testData.users.user1._id,
+            tree_id: workingData.tree1._id
+          })
+          .expect(201);
+
+        workingData.branch2t1 = res.body;
+
+      });
+
+      it("should /POST a commit", async () => {
+
+
+        let res = await request(server)
+          .post("/commits")
+          .send({
+            description: "",
+            branch_id: workingData.branch2t1._id
+          })
+          .expect(201);
+
+        workingData.commit1b2t1 = res.body;
+
+      });
+
+      it("should /POST a change", async () => {
+
+        let res = await request(server)
+          .post("/changes")
+          .send({
+            line_ids: [
+              1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,
+              20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,
+              36,37,38,39,40
+            ],
+            user_id: testData.users.user1._id,
+            commit_id: workingData.commit1b2t1._id,
+            branch_id: workingData.branch2t1._id,
+            type: "TIME_SHIFT",
+            data: {
+              timeShift: -22
+            }
+          })
+          .expect(201);
+
+        workingData.change1c1b2t1 = res.body;
+
+      });
+
+      it("should /PATCH the commit with a description and telling it's done", async () => {
+
+
+        let res = await request(server)
+          .patch("/commit/" + workingData.commit1b2t1._id)
+          .send({
+            description: "ajusted the timing",
+            done: true
+          })
+          .expect(200);
+
+      });
+
+      it("should /PATCH the branch telling it's done", async () => {
+
+        let res = await request(server)
+          .patch("/branch/" + workingData.branch2t1._id)
+          .send({
+            status: "FINISHED"
+          })
+          .expect(200);
+
+      });
+
+      it("should /PATCH the branch with the adm approval", async () => {
+
+        let res = await request(server)
+          .patch("/branch/" + workingData.branch2t1._id)
+          .send({
+            status: "APPROVED"
+          })
+          .expect(200);
+
+        expect(res.body.responseCode).toBe(1);
+        expect(res.body.approvedBranch.status).toBe("APPROVED");
+
+      });
+    });
+
+    describe("verify the state of the data after approval",()=>{
+
+
+      test("tree should have 2 branches in mainline", async () => {
+
+        let res = await request(server)
+          .get("/tree/" + workingData.tree1._id)
+          .expect(200);
+
+        const tree = res.body;
+        expect(tree.mainlineLength).toBe(2);
+
+
+      });
+
+      test("branches data should have been updated accordingly", async () => {
+
+        let res1 = await request(server)
+          .get("/branch/" + workingData.branch2t1._id)
+          .expect(200);
+
+
+        let res2 = await request(server)
+          .get("/branch/" + workingData.branch1t1._id)
+          .expect(200);
+
+        const branch2 = res2.body;
+        const branch1 = res1.body;
+
+        expect(branch1.isInMainline).toBeTruthy();
+        expect(branch1.mlBaseIndex).toBe(0);
+        expect(branch1.collaborators.length).toBe(1);
+        expect(branch1.collaborators[0].user_id).toBe(testData.users.user1._id);
+        expect(branch1.source_id).toBeUndefined();
+
+        expect(branch2.isInMainline).toBeFalsy();
+        expect(branch2.mlBaseIndex).toBe(0);
+        expect(branch2.collaborators.length).toBe(1);
+        expect(branch2.collaborators[0].user_id).toBe(testData.users.user1._id);
+        expect(branch2.source_id).toBeUndefined();
+
+      });
+
+
+    });
+
+    describe("Rebase without conflicts", ()=>{
+      it("should /PATCH the branch2 with the adm approval", async () => {
+
+        let res = await request(server)
+          .patch("/branch/" + workingData.branch1t1._id)
+          .send({
+            status: "APPROVED"
+          })
+          .expect(200);
+
+        console.log(res.body)
+
+        expect(res.body.responseCode).toBe(2);
+        expect(res.body.approvedBranch.status).toBe("APPROVED");
+
+      });
     });
 
 
