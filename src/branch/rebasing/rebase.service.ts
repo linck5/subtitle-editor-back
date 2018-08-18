@@ -5,6 +5,7 @@ import { Branch } from '../branch.schema';
 import { Tree } from '../../tree/tree.schema';
 import { Model, Schema } from 'mongoose';
 import { Change } from '../../change/change.schema';
+import { RebasedChangeDTO } from '../../change/change.dtos'
 
 
 @Injectable()
@@ -83,12 +84,21 @@ export class RebaseService {
       }
       if(conflict){
         rebaseData.push(conflict);
-        hasConflicts = false;
+        hasConflicts = true;
       }
-      else rebaseData.push(sChange);
+      else {
+        //don't insert this as an actual Change Schema with the _id field intact
+        //because then it'll throw an duplicate key error
+        let change:any = sChange;
+        change.change_id = sChange._id;
+        change._id = undefined;
+
+        rebaseData.push(sChange);
+      }
     }
 
     const NewRebase = new this.rebaseModel({
+      tree_id: tree._id,
       sourceBranch: sourceBranch,
       targetLineBranch_ids: targetLineIds,
       rebaseData: rebaseData,
