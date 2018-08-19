@@ -347,6 +347,7 @@ describe('Api Tests', () => {
     });
 
     describe("Rebase without conflicts", ()=>{
+
       it("should /PATCH the branch2 with the adm approval", async () => {
 
         let res = await request(server)
@@ -356,12 +357,34 @@ describe('Api Tests', () => {
           })
           .expect(200);
 
-        console.log(res.body)
 
         expect(res.body.responseCode).toBe(2);
+
         expect(res.body.approvedBranch.status).toBe("APPROVED");
+        expect(res.body.approvedBranch.isInMainline).toBeFalsy();
+        expect(res.body.approvedBranch.mlBaseIndex).toBe(0);
+        expect(res.body.approvedBranch.source_id).toBeUndefined();
+
+        expect(res.body.rebasedBranch.status).toBe("REBASED");
+        expect(res.body.rebasedBranch.isInMainline).toBeTruthy();
+        expect(res.body.rebasedBranch.mlBaseIndex).toBe(1);
+        expect(res.body.rebasedBranch.source_id).toBe(res.body.approvedBranch._id);
 
       });
+
+      test("tree should have 3 branches in mainline", async () => {
+
+        let res = await request(server)
+          .get("/tree/" + workingData.tree1._id)
+          .expect(200);
+
+        const tree = res.body;
+        expect(tree.mainlineLength).toBe(3);
+
+
+      });
+
+
     });
 
 
