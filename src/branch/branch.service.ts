@@ -153,6 +153,9 @@ export class BranchService {
         if(pendingRebase._id == resolvedRebase._id){
           const rebasedBranch:Branch = await this.CreateRebasedBranch(tree, resolvedRebase);
 
+          branch.status = "APPROVED";
+          await branch.save();
+
           return {
             responseCode: 5,
             message: "Approved successfuly and rebased with given rebase data",
@@ -197,6 +200,9 @@ export class BranchService {
         }
         else{
           const rebasedBranch = await this.CreateRebasedBranch(tree, rebase);
+
+          branch.status = "APPROVED";
+          await branch.save();
 
           return {
             responseCode: 2,
