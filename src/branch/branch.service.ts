@@ -77,7 +77,8 @@ export class BranchService {
         deleted: false,
         tree_id: tree._id,
         mlBaseIndex: mainlineBaseIndex,
-        isInMainline: true
+        isInMainline: true,
+        source_id: rebase.sourceBranch._id
       });
       await rebasedBranch.save();
 
