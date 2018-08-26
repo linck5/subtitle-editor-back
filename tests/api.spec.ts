@@ -115,7 +115,7 @@ describe('Api Tests', () => {
         let res = await request(server)
           .post('/subtitles/fromAss')
           .send({
-              assstring: fs.readFileSync('./tests/kaiji12.ass', "utf8")
+              assstring: fs.readFileSync('./tests/sampleSubs/kaiji12.ass', "utf8")
           })
           .expect(201);
 
