@@ -387,6 +387,48 @@ describe('Api Tests', () => {
 
     });
 
+//     describe("Rebase with conflicts", ()=>{
+//
+//       test("/POST another branch with some conflicting changes", async ()=>{
+//
+// //CANT DO
+//         let branch = await request(server)
+//           .post("/branches")
+//           .send({
+//             creator_id: testData.users.user1._id,
+//             tree_id: workingData.tree1._id
+//           })
+//           .expect(201);
+//
+//         let commit = await request(server)
+//           .post("/commits")
+//           .send({
+//             description: "",
+//             branch_id: workingData.branch1t1._id
+//           })
+//           .expect(201);
+//
+//
+//         let change = await request(server)
+//           .post("/changes")
+//           .send({
+//             line_ids: [5],
+//             user_id: testData.users.user1._id,
+//             commit_id: workingData.commit1b1t1._id,
+//             branch_id: workingData.branch1t1._id,
+//             type: "EDIT",
+//             data: {
+//               text: "普通な漢字"
+//             }
+//           })
+//           .expect(201);
+//
+//
+//       });
+//
+//
+//     });
+
 
 
   });
