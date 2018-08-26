@@ -203,6 +203,64 @@ describe('Api Tests', () => {
         workingData.change1c1b1t1 = res.body;
 
       });
+
+      it("should /POST some more different types of change", async () => {
+
+        const templateChange:any = {
+          user_id: testData.users.user1._id,
+          commit_id: workingData.commit1b1t1._id,
+          branch_id: workingData.branch1t1._id
+        };
+
+        const postChangeWithTemplate = (template, change) =>{
+          return request(server)
+            .post("/changes")
+            .send(Object.assign(change, template));
+        }
+
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [98],
+          type: "EDIT",
+          data: {
+            startTime: 400100,
+            endTime: 400200
+          }
+        }).expect(201);
+
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [99],
+          type: "EDIT",
+          data: {
+            endTime: 500100
+          }
+        }).expect(201);
+
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [100],
+          type: "EDIT",
+          data: {
+            startTime: 500200
+          }
+        }).expect(201);
+
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [101],
+          type: "DELETE"
+        }).expect(201);
+
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [102, 103, 104],
+          type: "DELETE"
+        }).expect(201);
+
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [106],
+          type: "DELETE"
+        }).expect(201);
+
+
+      });
+
     });
 
     describe("Finishing and approving another branch",()=>{
