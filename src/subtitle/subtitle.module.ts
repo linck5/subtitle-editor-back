@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SubtitleService } from './subtitle.service';
-import { AssString2SubtitleModelService } from './assConverter.service';
+import { AssConverterService } from './assConverter.service';
 import { SubtitleSchema } from './subtitle.schema';
 import { DatabaseModule } from '../database/database.module';
 import { getCollectionProvider } from '../database/database.providers';
@@ -14,7 +14,7 @@ import { SubtitleController } from './subtitle.controller';
       getCollectionProvider(SubtitleSchema, "Subtitle"),
       getCollectionProvider(LineSchema, "Line"),
       SubtitleService,
-      AssString2SubtitleModelService
+      AssConverterService
     ],
     controllers: [SubtitleController],
     exports: [SubtitleService]

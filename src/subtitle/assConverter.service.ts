@@ -6,14 +6,14 @@ import * as assCompiler from 'ass-compiler';
 
 @Injectable()
 // tslint:disable-next-line:component-class-suffix
-export class AssString2SubtitleModelService {
+export class AssConverterService {
 
     constructor(
       @Inject('Subtitle') private readonly subtitleModel: Model<Subtitle>
     ) { }
 
 
-    Convert(assStr: string): Subtitle {
+    AssString2Subtitle(assStr: string): Subtitle {
 
       let compiled = assCompiler.compile(assStr);
       let lines = [];
@@ -29,10 +29,19 @@ export class AssString2SubtitleModelService {
       });
 
       return new this.subtitleModel({
+        format: "ass",
+        original: assStr,
         lines: lines,
         lastId: lines.length - 1
       });
 
+    }
+
+    ApplySubtitleToOriginalAssString(subtitle: Subtitle): string {
+      if(subtitle.format != "ass") //no
+      if(!subtitle.original) //no
+
+      return ""; //TODO
     }
 
 }

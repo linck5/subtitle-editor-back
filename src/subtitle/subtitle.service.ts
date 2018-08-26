@@ -4,7 +4,7 @@ import { CreateSubtitleDTO } from './subtitle.dtos';
 import { Subtitle } from './subtitle.schema';
 import { Line } from './line/line.schema';
 import { Change } from '../change/change.schema';
-import { AssString2SubtitleModelService } from './assConverter.service';
+import { AssConverterService } from './assConverter.service';
 
 @Injectable()
 // tslint:disable-next-line:component-class-suffix
@@ -13,7 +13,7 @@ export class SubtitleService {
     constructor(
       @Inject('Subtitle') private readonly subtitleModel: Model<Subtitle>,
       @Inject('Line') private readonly lineModel: Model<Line>,
-      private readonly assString2SubtitleModel: AssString2SubtitleModelService
+      private readonly assConverterService: AssConverterService
     ) { }
 
     async Create(subtitle: CreateSubtitleDTO): Promise<Subtitle> {
@@ -41,7 +41,7 @@ export class SubtitleService {
 
     async CreateFromASSFile(assFile: any): Promise<Subtitle> {
 
-      return await this.assString2SubtitleModel.Convert(assFile).save();
+      return await this.assConverterService.AssString2Subtitle(assFile).save();
     }
 
 
