@@ -1,5 +1,5 @@
 import { Model, PaginateModel, PaginateResult, PaginateOptions,
-  ModelUpdateOptions, Schema } from 'mongoose';
+  ModelFindByIdAndUpdateOptions, Schema } from 'mongoose';
 import { Injectable, Inject } from '@nestjs/common';
 import { Branch } from './branch.schema';
 import { Tree } from '../tree/tree.schema';
@@ -113,7 +113,7 @@ export class BranchService {
 
 
     async Update(id, updateDto: UpdateBranchDTO): Promise<Branch | ApproveResponse> {
-      const options:ModelUpdateOptions = {
+      const options:ModelFindByIdAndUpdateOptions = {
         new: true, // true to return the modified document rather than the original
         runValidators: true
       }
@@ -134,9 +134,10 @@ export class BranchService {
 
       }
       else{
-        const updatedBranch:Branch = await branch.update(updateDto);
 
-        return updatedBranch;
+        //TODO update the branch without finding by id again
+        let res =  await this.branchModel.findByIdAndUpdate(branch._id, updateDto, options);
+        return res;
       }
 
 
@@ -201,6 +202,9 @@ export class BranchService {
         }
         else{
           const rebasedBranch = await this.CreateRebasedBranch(tree, rebase);
+
+          rebase.fulfilled = true;
+          await rebase.save();
 
           branch.status = "APPROVED";
           await branch.save();

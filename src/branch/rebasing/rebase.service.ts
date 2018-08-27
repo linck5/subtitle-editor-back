@@ -11,14 +11,15 @@ import { RebasedChangeDTO } from '../../change/change.dtos'
 @Injectable()
 export class RebaseService {
 
+  conflict: Conflict;
+  pushChange: boolean;
+
   constructor(
     @Inject('Rebase') private readonly rebaseModel: Model<Rebase>,
     @Inject('Tree') private readonly treeModel: Model<Tree>,
     @Inject('Branch') private readonly branchModel: Model<Branch>,
     @Inject('Change') private readonly changeModel: Model<Change>
   ) { }
-
-
 
   async Apply(resolvedRebaseDto:ResolvedRebaseDTO, tree?:Tree, rebase?:Rebase): Promise<Rebase> {
 
@@ -69,7 +70,8 @@ export class RebaseService {
 
     for(const sChange of sourceChanges){
 
-      let conflict: Conflict = null;
+      this.conflict = null;
+      this.pushChange = true;
 
       for(const tChange of targetLineChanges){
 
@@ -77,16 +79,17 @@ export class RebaseService {
           for(const tLineId of tChange.line_ids){
 
             if(sLineId == tLineId){
-              this.CheckForConflicts(conflict, sChange, tChange, sLineId);
+              this.CheckForConflicts(sChange, tChange, sLineId);
             }
           }
         }
       }
-      if(conflict){
-        rebaseData.push(conflict);
+
+      if(this.conflict){
+        rebaseData.push(this.conflict);
         hasConflicts = true;
       }
-      else {
+      else if(this.pushChange){
         //don't insert this as an actual Change Schema with the _id field intact
         //because then it'll throw an duplicate key error
         let change:any = sChange;
@@ -109,11 +112,10 @@ export class RebaseService {
     return await NewRebase.save();
   }
 
-  CheckForConflicts(conflict:Conflict, sChange:Change , tChange:Change, lineId:number){
+  CheckForConflicts(sChange:Change , tChange:Change, lineId:number){
 
     const updateCurrentConflict = (conflictingDataTypes?) => {
-      this.UpdateConflict(
-        conflict, sChange, tChange, lineId, conflictingDataTypes
+      this.UpdateConflict(sChange, tChange, lineId, conflictingDataTypes
       );
     }
     let conflictingDataTypes;
@@ -121,9 +123,15 @@ export class RebaseService {
     switch(sChange.type + " - " + tChange.type){
 
       case "DELETE - DELETE":
-        //the target line already has a change that
-        //deletes this line, so remove this id from the change
-        sChange.line_ids.splice(sChange.line_ids.indexOf(lineId), 1);
+        if(sChange.line_ids.length > 1){
+          //the target line already has a change that
+          //deletes this line, so remove this id from the change
+          sChange.line_ids.splice(sChange.line_ids.indexOf(lineId), 1);
+        }
+        else{
+          //or if it was the only id, discard the whole change
+          this.pushChange = false;
+        }
         break;
 
       case "DELETE - EDIT":
@@ -136,11 +144,29 @@ export class RebaseService {
 
       case "EDIT - EDIT":
         conflictingDataTypes = [];
-        Object.keys(sChange.data).forEach(key => {
+
+        let sChangeDataFields = Object.keys(sChange.toObject().data);
+
+        sChangeDataFields.forEach(key => {
           if(
           sChange.data[key] != undefined &&
           tChange.data[key] != undefined){
-            conflictingDataTypes.push(key);
+
+            if(sChange.data[key] != tChange.data[key]){
+              conflictingDataTypes.push(key);
+            }
+            //if the two edits edit one or more data fields in exactly
+            //the same way, there is no need for a conflict, just delete
+            //that data field from the source change edit, or if it was the only
+            //data field, discard the whole change
+            else if(sChangeDataFields.length > 1){
+              sChange.data[key] = undefined;
+            }
+            else{
+              this.pushChange = false;
+            }
+
+
           }
         })
         if(conflictingDataTypes.length > 0)
@@ -172,11 +198,11 @@ export class RebaseService {
   }
 
   UpdateConflict(
-    conflict:Conflict, sChange:Change, tChange:Change,
+    sChange:Change, tChange:Change,
     conflictingId:number, conflictingDataTypes?:Array<any>
   ): void {
-    if(conflict == null){
-      conflict = {
+    if(this.conflict == null){
+      this.conflict = {
         conflictingLines: [conflictingId],
         sourceChange: sChange,
         targetChange: tChange,
@@ -184,7 +210,7 @@ export class RebaseService {
       }
     }
     else{
-      conflict.conflictingLines.push(conflictingId);
+      this.conflict.conflictingLines.push(conflictingId);
     }
   }
 
