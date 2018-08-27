@@ -27,6 +27,12 @@ describe('Api Tests', () => {
     }
   };
 
+  const postChangeWithTemplate = (template, change) =>{
+    return request(server)
+      .post("/changes")
+      .send(Object.assign(change, template));
+  }
+
   beforeAll(async () => {
     server = await getNestMongoApp();
   });
@@ -129,12 +135,18 @@ describe('Api Tests', () => {
 
     let workingData = {
       tree1: null,
+
       branch1t1: null,
       commit1b1t1: null,
       change1c1b1t1: null,
+
       branch2t1: null,
       commit1b2t1: null,
-      change1c1b2t1: null
+      change1c1b2t1: null,
+
+      branch3t1: null,
+
+      branch4t1: null
     }
 
     describe("tree creation and first branch with a commit and a change", ()=>{
@@ -204,7 +216,7 @@ describe('Api Tests', () => {
 
       });
 
-      it("should /POST some more different types of change", async () => {
+      it("should /POST some more different types of change to be tested on conflicts later", async () => {
 
         const templateChange:any = {
           user_id: testData.users.user1._id,
@@ -212,11 +224,13 @@ describe('Api Tests', () => {
           branch_id: workingData.branch1t1._id
         };
 
-        const postChangeWithTemplate = (template, change) =>{
-          return request(server)
-            .post("/changes")
-            .send(Object.assign(change, template));
-        }
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [97],
+          type: "EDIT",
+          data: {
+            text: "random stuff"
+          }
+        }).expect(201);
 
         await postChangeWithTemplate(templateChange, {
           line_ids: [98],
@@ -258,6 +272,39 @@ describe('Api Tests', () => {
           type: "DELETE"
         }).expect(201);
 
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [150, 151, 152],
+          type: "TIME_SHIFT",
+          data: {
+            timeShift: -80
+          }
+        }).expect(201);
+
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [153],
+          type: "TIME_SHIFT",
+          data: {
+            timeShift: 105
+          }
+        }).expect(201);
+
+
+      });
+
+    });
+    describe("Another branch that will be used in a later test",()=>{
+
+      it("should /POST a branch", async () => {
+
+        let branch = await request(server)
+          .post("/branches")
+          .send({
+            creator_id: testData.users.user1._id,
+            tree_id: workingData.tree1._id
+          })
+        .expect(201);
+
+        workingData.branch3t1 = branch.body;
 
       });
 
@@ -406,7 +453,7 @@ describe('Api Tests', () => {
 
     describe("Rebase without conflicts", ()=>{
 
-      it("should /PATCH the branch2 with the adm approval", async () => {
+      it("should /PATCH the branch1t1 with the adm approval", async () => {
 
         let res = await request(server)
           .patch("/branch/" + workingData.branch1t1._id)
@@ -428,6 +475,8 @@ describe('Api Tests', () => {
         expect(res.body.rebasedBranch.mlBaseIndex).toBe(1);
         expect(res.body.rebasedBranch.source_id).toBe(res.body.approvedBranch._id);
 
+        workingData.branch4t1 = res.body.rebasedBranch;
+
       });
 
       test("tree should have 3 branches in mainline", async () => {
@@ -445,7 +494,165 @@ describe('Api Tests', () => {
 
     });
 
+    describe("Rebase with conflicts", ()=>{
 
+      test("make conflicting changes in branch branch3t1", async ()=>{
+
+
+        let commitRes = await request(server)
+          .post("/commits")
+          .send({
+            description: "",
+            branch_id: workingData.branch3t1._id
+          })
+          .expect(201);
+
+
+        const templateChange:any = {
+          user_id: testData.users.user1._id,
+          commit_id: commitRes.body._id,
+          branch_id: workingData.branch3t1._id
+        };
+
+        //conflict: different text
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [5],
+          type: "EDIT",
+          data: {
+            text: "conflicting text change"
+          }
+        }).expect(201);
+
+        //no conflict: target changes don't touch line 15
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [15],
+          type: "EDIT",
+          data: {
+            startTime: 50220
+          }
+        }).expect(201);
+
+        //no conflict: target changes don't touch line 16
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [16],
+          type: "DELETE"
+        }).expect(201);
+
+        //no conflict: exact same text edit
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [97],
+          type: "EDIT",
+          data: {
+            text: "random stuff"
+          }
+        }).expect(201);
+
+        //conflict: the target change changes start and end time
+        //and this one changes only start time
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [98],
+          type: "EDIT",
+          data: {
+            startTime: 400150,
+          }
+        }).expect(201);
+
+        //conflict: target change edits end time on line 99
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [98, 99],
+          type: "TIME_SHIFT",
+          data: {
+            endTime: 500100
+          }
+        }).expect(201);
+
+        //conflict: target change deletes this line
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [101],
+          type: "EDIT",
+          data: {
+            startTime: 600100
+          }
+        }).expect(201);
+
+        //conflict: target change deletes lines 102, 103, and 104 in one change,
+        //and 106 in another change
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [104, 105, 106],
+          type: "TIME_SHIFT",
+          data: {
+            timeShift: 250
+          }
+        }).expect(201);
+
+        //conflict: target change timeshifts 150, 151 and 152 by -80
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [151, 152],
+          type: "TIME_SHIFT",
+          data: {
+            timeShift: -85
+          }
+        }).expect(201);
+
+        //no conflict: target change time shifts line 153, but this change only
+        //touches the text
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [153],
+          type: "EDIT",
+          data: {
+            text: "timeshift / text"
+          }
+        }).expect(201);
+
+        await request(server)
+          .patch("/commit/" + commitRes.body._id)
+          .send({
+            description: "conflicting commit",
+            done: true
+          })
+          .expect(200);
+
+      });
+
+      test("approving the branch", async ()=>{
+
+        await request(server)
+          .patch("/branch/" + workingData.branch3t1._id)
+          .send({
+            status: "FINISHED"
+          })
+          .expect(200);
+
+
+        let res = await request(server)
+          .patch("/branch/" + workingData.branch3t1._id)
+          .send({
+            status: "APPROVED"
+          })
+          .expect(200);
+
+          console.log(JSON.stringify(res.body, null, 4))
+
+
+          expect(res.body.responseCode).toBe(3);
+
+          expect(res.body.rebase).toBeDefined();
+          expect(res.body.rebase.targetLineBranch_ids).toBe([workingData.branch4t1._id]);
+
+          // expect(res.body.approvedBranch.status).toBe("APPROVED");
+          // expect(res.body.approvedBranch.isInMainline).toBeFalsy();
+          // expect(res.body.approvedBranch.mlBaseIndex).toBe(0);
+          // expect(res.body.approvedBranch.source_id).toBeUndefined();
+          //
+          // expect(res.body.rebasedBranch.status).toBe("REBASED");
+          // expect(res.body.rebasedBranch.isInMainline).toBeTruthy();
+          // expect(res.body.rebasedBranch.mlBaseIndex).toBe(1);
+          // expect(res.body.rebasedBranch.source_id).toBe(res.body.approvedBranch._id);
+
+      });
+
+
+    });
 
   });
 
