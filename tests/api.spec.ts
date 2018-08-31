@@ -562,7 +562,7 @@ describe('Api Tests', () => {
           line_ids: [98, 99],
           type: "TIME_SHIFT",
           data: {
-            endTime: 500100
+            timeShift: 500100
           }
         }).expect(201);
 
