@@ -37,6 +37,9 @@ export class UpdateBranchDTO {
 
 export class ListBranchDTO {
 
+  @IsBoolean()
+  readonly isInMainline: boolean;
+
   @IsInt()
   readonly limit: number;
 

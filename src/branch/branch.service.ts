@@ -234,6 +234,7 @@ export class BranchService {
     async List(dto:ListBranchDTO): Promise<PaginateResult<Branch>> {
 
       let query:any = {};
+      if(dto.isInMainline != undefined) query.isInMainline = dto.isInMainline;
 
       const options = this.paginationService.PaginateOptionsFromDto(dto);
 
