@@ -1,6 +1,8 @@
-import { Model, PaginateModel, PaginateResult } from 'mongoose';
+import { Model, PaginateModel, PaginateResult, Schema } from 'mongoose';
 import { Injectable, Inject } from '@nestjs/common';
 import { Change } from './change.schema';
+import { Tree } from '../tree/tree.schema';
+import { Branch } from '../branch/branch.schema';
 import { CreateChangeDTO, ListChangeDTO } from './change.dtos';
 
 import { PaginationService } from '../common/pagination.service';
@@ -12,6 +14,8 @@ export class ChangeService {
     constructor(
       @Inject('Change') private readonly changeModel: Model<Change>,
       @Inject('Change') private readonly paginateChangeModel: PaginateModel<Change>,
+      @Inject('Branch') private readonly branchModel: Model<Branch>,
+      @Inject('Tree') private readonly treeModel: Model<Tree>,
       private readonly paginationService: PaginationService
     ) { }
 
@@ -39,6 +43,30 @@ export class ChangeService {
     async GetById(id): Promise<Change> {
       return await this.changeModel.findById(id);
     }
+
+    async OrderedMainlineChanges(tree_id): Promise<Change[]> {
+
+      const tree:Tree = await this.treeModel.findById(tree_id);
+
+      const branch_ids:Schema.Types.ObjectId[] = (await this.branchModel.find({
+        tree_id: tree._id,
+        isInMainline: true
+      }))
+        .sort((a, b) => a.mlBaseIndex - b.mlBaseIndex)
+        .map(doc => doc._id);
+
+      let orderedMainlineChanges:Change[] = [];
+
+      for(let branch_id of branch_ids){
+        const branchChanges:Change[] = await this.changeModel.find({
+          branch_id: branch_id
+        });
+        orderedMainlineChanges.push(...branchChanges);
+      }
+
+      return orderedMainlineChanges;
+    }
+
     async List(dto:ListChangeDTO): Promise<PaginateResult<Change>> {
 
       let query:any = {};

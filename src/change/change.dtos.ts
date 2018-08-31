@@ -89,6 +89,12 @@ export class ListChangeDTO {
 export const changeOrderByParams =
 ['type', 'user', 'commit'];
 
+export class ListOrderedMainlineChanges {
+
+  @IsMongoId()
+  readonly tree_id: Schema.Types.ObjectId;;
+}
+
 
 export class ChangeDataDTO {
 

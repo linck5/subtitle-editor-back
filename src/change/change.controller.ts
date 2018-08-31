@@ -19,6 +19,16 @@ export class ChangeController {
     });
   }
 
+  @Get('/changes/mainline/:tree_id')
+  async ListOrderedMainlineChanges( @Param('tree_id') tree_id) {
+    return await this.changeService.OrderedMainlineChanges(tree_id)
+    .catch(err => {
+      throw new HttpException({
+        error: err
+      }, HttpStatus.BAD_REQUEST);
+    });
+  }
+
   @Get('/change/:change_id')
   async GetById( @Param('change_id') change_id) {
     return await this.changeService.GetById(change_id)
