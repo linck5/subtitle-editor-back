@@ -176,11 +176,14 @@ export class RebaseService {
       case "EDIT - TIME_SHIFT":
         conflictingDataTypes = [];
 
-        if(sChange.data.startTime != undefined)
-          conflictingDataTypes.push("startTime");
+        for(let change of [sChange, tChange]){
+          if(change.data.startTime != undefined)
+            conflictingDataTypes.push("startTime");
 
-        if(sChange.data.endTime != undefined)
-          conflictingDataTypes.push("endTime");
+          if(change.data.endTime != undefined)
+            conflictingDataTypes.push("endTime");
+        }
+
 
         if(conflictingDataTypes.length > 0)
           updateCurrentConflict(conflictingDataTypes);
