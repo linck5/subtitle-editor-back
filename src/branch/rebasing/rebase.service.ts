@@ -135,10 +135,12 @@ export class RebaseService {
         break;
 
       case "DELETE - EDIT":
+      case "EDIT - DELETE":
         updateCurrentConflict();
         break;
 
       case "DELETE - TIME_SHIFT":
+      case "TIME_SHIFT - DELETE":
         updateCurrentConflict();
         break;
 
@@ -174,6 +176,7 @@ export class RebaseService {
         break;
 
       case "EDIT - TIME_SHIFT":
+      case "TIME_SHIFT - EDIT":
         conflictingDataTypes = [];
 
         for(let change of [sChange, tChange]){
@@ -208,12 +211,16 @@ export class RebaseService {
       this.conflict = {
         conflictingLines: [conflictingId],
         sourceChange: sChange,
-        targetChange: tChange,
+        targetChanges: [tChange],
         conflictingDataTypes: conflictingDataTypes
       }
     }
     else{
       this.conflict.conflictingLines.push(conflictingId);
+      if(this.conflict.targetChanges.indexOf(tChange) == -1){
+        this.conflict.targetChanges.push(tChange);
+      }
+
     }
   }
 

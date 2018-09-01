@@ -17,7 +17,7 @@ export type RebaseData = (Change | Conflict)[];
 export interface Conflict {
   conflictingLines:Array<number>;
   sourceChange:Change;
-  targetChange:Change;
+  targetChanges:Change[];
   conflictingDataTypes:Array<string>;
 }
 
