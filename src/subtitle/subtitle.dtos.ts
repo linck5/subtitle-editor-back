@@ -18,3 +18,9 @@ export class CreateSubtitleFromASSFileDTO {
   @IsString()
   readonly assstring: string;
 }
+
+export class ApplySubtitleDTO {
+
+  @IsDefined()
+  readonly changes: any[];
+}

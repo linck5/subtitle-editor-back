@@ -1,7 +1,8 @@
 import { Controller, Post, HttpStatus, Param, Get, Body, Delete,
   HttpException } from '@nestjs/common';
 import { SubtitleService } from './subtitle.service';
-import { CreateSubtitleDTO, CreateSubtitleFromASSFileDTO} from './subtitle.dtos';
+import { CreateSubtitleDTO, CreateSubtitleFromASSFileDTO,
+ApplySubtitleDTO} from './subtitle.dtos';
 
 @Controller()
 export class SubtitleController {
@@ -11,6 +12,17 @@ export class SubtitleController {
   @Get('/subtitle/:subtitle_id')
   async GetById( @Param('subtitle_id') subtitle_id) {
     return await this.subtitleService.GetById(subtitle_id)
+    .catch(err => {
+      throw new HttpException({
+        error: err
+      }, HttpStatus.BAD_REQUEST);
+    });
+  }
+
+  @Get('/subtitle/apply/:subtitle_id')
+  async Apply( @Param('subtitle_id') subtitle_id, @Body() applySubtitleDTO:ApplySubtitleDTO) {
+
+    return await this.subtitleService.ApplyChanges(subtitle_id, applySubtitleDTO.changes)
     .catch(err => {
       throw new HttpException({
         error: err
