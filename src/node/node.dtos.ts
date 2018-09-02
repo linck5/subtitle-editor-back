@@ -3,10 +3,10 @@ import { IsString, IsInt, IsBoolean, ValidateNested, IsMongoId, IsDefined,
 Matches } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
-import { UpdateBranchCollaboratorDTO } from './collaborator/collaborator.dtos';
+import { UpdateNodeCollaboratorDTO } from './collaborator/collaborator.dtos';
 import { ResolvedRebaseDTO } from './rebasing/rebase.dtos';
 
-export class CreateBranchDTO {
+export class CreateNodeDTO {
 
   @IsDefined()
   @IsMongoId()
@@ -17,7 +17,7 @@ export class CreateBranchDTO {
   readonly tree_id: string;
 }
 
-export class UpdateBranchDTO {
+export class UpdateNodeDTO {
 
   @IsString()
   @Matches(/(?:IN_PROGRESS)|(?:FINISHED)|(?:APPROVED)/)
@@ -31,11 +31,11 @@ export class UpdateBranchDTO {
   readonly resolvedRebase: ResolvedRebaseDTO;
 
   @ValidateNested({ each: true })
-  @Type(() => UpdateBranchCollaboratorDTO)
-  readonly collaborators: UpdateBranchCollaboratorDTO[];
+  @Type(() => UpdateNodeCollaboratorDTO)
+  readonly collaborators: UpdateNodeCollaboratorDTO[];
 }
 
-export class ListBranchDTO {
+export class ListNodeDTO {
 
   @IsBoolean()
   readonly isInMainline: boolean;
@@ -53,5 +53,5 @@ export class ListBranchDTO {
   readonly page: number;
 }
 
-export const branchOrderByParams =
+export const nodeOrderByParams =
 ['status']

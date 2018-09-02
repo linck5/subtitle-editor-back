@@ -3,10 +3,10 @@ import { Model, PaginateModel, PaginateResult, PaginateOptions,
 import { Injectable, Inject } from '@nestjs/common';
 import { Tree } from './tree.schema';
 import { Commit } from '../commit/commit.schema';
-import { Branch } from '../branch/branch.schema';
+import { Node } from '../node/node.schema';
 import { Video } from '../video/video.schema';
 import { Change } from '../change/change.schema';
-import { Rebase } from '../branch/rebasing/rebase.schema';
+import { Rebase } from '../node/rebasing/rebase.schema';
 import { Comment } from '../comment/comment.schema';
 import { User } from '../user/user.schema';
 import { CreateTreeDTO, UpdateTreeDTO, ListTreeDTO } from './tree.dtos';
@@ -23,7 +23,7 @@ export class TreeService {
       @Inject('Tree') private readonly paginateTreeModel: PaginateModel<Tree>,
       @Inject('Change') private readonly changeModel: Model<Change>,
       @Inject('Commit') private readonly commitModel: Model<Commit>,
-      @Inject('Branch') private readonly branchModel: Model<Branch>,
+      @Inject('Node') private readonly nodeModel: Model<Node>,
       @Inject('Rebase') private readonly rebaseModel: Model<Rebase>,
       @Inject('Comment') private readonly commentModel: Model<Comment>,
       @Inject('Video') private readonly videoModel: Model<Video>,
@@ -39,21 +39,21 @@ export class TreeService {
 
     async Create(tree: CreateTreeDTO): Promise<Tree> {
 
-      //create the root branch
-      const NewBranch = new this.branchModel({
+      //create the root node
+      const NewNode = new this.nodeModel({
         collaborators: [],
         status: "ROOT",
         deleted: false,
         isInMainline: true,
         mlBaseIndex: -1
       });
-      await NewBranch.save();
+      await NewNode.save();
 
 
-      // create an empty commit for the root branch
+      // create an empty commit for the root node
       const NewCommit = new this.commitModel({
         description: "root",
-        branch: NewBranch._id
+        node: NewNode._id
       });
       await NewCommit.save();
 
@@ -109,9 +109,9 @@ export class TreeService {
       if(await this.rebaseModel.count({}) != 0){
         await this.rebaseModel.collection.drop();
       }
-      if(await this.branchModel.count({}) != 0){
-        await this.userModel.updateMany({},  { branch_ids: [] });
-        await this.branchModel.collection.drop();
+      if(await this.nodeModel.count({}) != 0){
+        await this.userModel.updateMany({},  { node_ids: [] });
+        await this.nodeModel.collection.drop();
       }
       if(await this.treeModel.count({}) != 0){
         await this.videoModel.updateMany({}, { tree_ids: [] });

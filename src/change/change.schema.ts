@@ -6,7 +6,7 @@ export interface Change extends Document {
   line_ids: number[];
   user_id: Schema.Types.ObjectId;
   commit_id: Schema.Types.ObjectId;
-  branch_id: Schema.Types.ObjectId;
+  node_id: Schema.Types.ObjectId;
   creation: Date;
   type: string;
   data: {
@@ -35,9 +35,9 @@ export const ChangeSchema = new Schema({
     required: true,
     index: true
   },
-  branch_id: {
+  node_id: {
     type: Schema.Types.ObjectId,
-    ref: 'Branch',
+    ref: 'Node',
     required: true,
     index: true
   },

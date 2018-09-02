@@ -1,7 +1,7 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { Rebase, RebaseData, Conflict } from './rebase.schema';
 import { ResolvedRebaseDTO } from './rebase.dtos';
-import { Branch } from '../branch.schema';
+import { Node } from '../node.schema';
 import { Tree } from '../../tree/tree.schema';
 import { Model, Schema } from 'mongoose';
 import { Change } from '../../change/change.schema';
@@ -17,7 +17,7 @@ export class RebaseService {
   constructor(
     @Inject('Rebase') private readonly rebaseModel: Model<Rebase>,
     @Inject('Tree') private readonly treeModel: Model<Tree>,
-    @Inject('Branch') private readonly branchModel: Model<Branch>,
+    @Inject('Node') private readonly nodeModel: Model<Node>,
     @Inject('Change') private readonly changeModel: Model<Change>
   ) { }
 
@@ -30,11 +30,11 @@ export class RebaseService {
 
     for(let rebaseDataElement of resolvedRebaseDto.rebaseData){
 
-      //all the resolved changes must be from the source branch
-      if(rebaseDataElement.branch_id != rebase.sourceBranch._id){
+      //all the resolved changes must be from the source node
+      if(rebaseDataElement.node_id != rebase.sourceNode._id){
         throw new HttpException({
-          error: "The resolved changes must all point to the branch of id: "
-           + rebase.sourceBranch._id
+          error: "The resolved changes must all point to the node of id: "
+           + rebase.sourceNode._id
         }, HttpStatus.BAD_REQUEST);
       }
       else{
@@ -48,21 +48,21 @@ export class RebaseService {
     return rebase;
   }
 
-  async Create(tree:Tree, sourceBranch:Branch): Promise<Rebase> {
+  async Create(tree:Tree, sourceNode:Node): Promise<Rebase> {
 
     const targetLineIds:Schema.Types.ObjectId[] =
-      (await this.branchModel.find({
+      (await this.nodeModel.find({
         tree_id: tree._id,
-        mlBaseIndex: {$gte: sourceBranch.mlBaseIndex},
+        mlBaseIndex: {$gte: sourceNode.mlBaseIndex},
         isInMainline: true
       }))
       .map(doc => doc._id);
 
     const targetLineChanges:Change[] =
-      await this.changeModel.find({branch_id: {$in: targetLineIds}});
+      await this.changeModel.find({node_id: {$in: targetLineIds}});
 
     const sourceChanges:Change[] =
-      await this.changeModel.find({branch_id: sourceBranch._id})
+      await this.changeModel.find({node_id: sourceNode._id})
 
     let rebaseData:RebaseData = [];
 
@@ -102,8 +102,8 @@ export class RebaseService {
 
     const NewRebase = new this.rebaseModel({
       tree_id: tree._id,
-      sourceBranch: sourceBranch,
-      targetLineBranch_ids: targetLineIds,
+      sourceNode: sourceNode,
+      targetLineNode_ids: targetLineIds,
       rebaseData: rebaseData,
       conflictsStatus: hasConflicts? "PENDING" : "NO_CONFLICTS",
       fulfilled: false

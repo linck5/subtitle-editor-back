@@ -24,7 +24,7 @@ export class CreateChangeDTO {
 
   @IsDefined()
   @IsMongoId()
-  readonly branch_id: Schema.Types.ObjectId;
+  readonly node_id: Schema.Types.ObjectId;
 
   @IsDefined()
   @IsString()
@@ -55,7 +55,7 @@ export class RebasedChangeDTO {
 
   @IsDefined()
   @IsMongoId()
-  readonly branch_id: Schema.Types.ObjectId;
+  readonly node_id: Schema.Types.ObjectId;
 
   @IsDefined()
   @IsString()

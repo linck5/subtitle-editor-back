@@ -2,7 +2,7 @@
 import { IsBoolean, IsMongoId, IsDefined } from 'class-validator';
 import { Schema } from 'mongoose';
 
-export class UpdateBranchCollaboratorDTO {
+export class UpdateNodeCollaboratorDTO {
 
   @IsDefined()
   @IsMongoId()

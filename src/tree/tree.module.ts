@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { TreeService } from './tree.service';
 import { TreeSchema } from './tree.schema';
 import { CommitSchema } from '../commit/commit.schema';
-import { BranchSchema } from '../branch/branch.schema';
+import { NodeSchema } from '../node/node.schema';
 import { VideoSchema } from '../video/video.schema';
 import { ChangeSchema } from '../change/change.schema';
-import { RebaseSchema } from '../branch/rebasing/rebase.schema';
+import { RebaseSchema } from '../node/rebasing/rebase.schema';
 import { CommentSchema } from '../comment/comment.schema';
 import { UserSchema } from '../user/user.schema';
 import { TreeController } from './tree.controller';
@@ -18,7 +18,7 @@ import { getCollectionProvider } from '../database/database.providers';
     providers: [
       getCollectionProvider(TreeSchema, "Tree"),
       getCollectionProvider(CommitSchema, "Commit"),
-      getCollectionProvider(BranchSchema, "Branch"),
+      getCollectionProvider(NodeSchema, "Node"),
       getCollectionProvider(VideoSchema, "Video"),
       getCollectionProvider(ChangeSchema, "Change"),
       getCollectionProvider(RebaseSchema, "Rebase"),

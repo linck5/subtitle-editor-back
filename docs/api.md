@@ -10,8 +10,8 @@ will return the same docs as:
 
 ### OrderBy parameters
 `orderby` parameters accept a comma-separated list of sort keys. Each key sorts ascending by default, but may be reversed with the `desc` modifier, separated from the key with a space. Example usage for listing users:
-`GET /users?orderBy=branchCount desc,name`
-This will put users with more branches first, and then users with the same number of branches sorted by name.
+`GET /users?orderBy=nodeCount desc,name`
+This will put users with more nodes first, and then users with the same number of nodes sorted by name.
 
 ### Parameters / Input
 Parameters are appended to the query string with a `?`:
@@ -21,13 +21,13 @@ Inputs are passed in the body as an object:
 
 ### Nested data
 
-Collaborator, Change, Commit, and Branch are all nested inside each other. So when getting or listing them it makes sense to be able to specify their parents in the path. For example:
+Collaborator, Change, Commit, and Node are all nested inside each other. So when getting or listing them it makes sense to be able to specify their parents in the path. For example:
 
 
 `GET /change/:change_id`
 can also be: `GET /commit/:commit_id/change/:change_id`
-or: `GET /branch/:branch_id/commit/:commit_id/change/:change_id`
-or: `GET /tree/:tree_id/branch/:branch_id/commit/:commit_id/change/:change_id`
+or: `GET /node/:node_id/commit/:commit_id/change/:change_id`
+or: `GET /tree/:tree_id/node/:node_id/commit/:commit_id/change/:change_id`
 
 
 # User
@@ -36,7 +36,7 @@ or: `GET /tree/:tree_id/branch/:branch_id/commit/:commit_id/change/:change_id`
   Username: string,
   Password: string,
   Roles: enum{ADMIN, MODERATOR}[],
-  Branches: Branch[],
+  Nodes: Node[],
   Creation: Date,
   LastOnline: Date,
   banned: boolean,
@@ -52,7 +52,7 @@ Name|Type|Notes
 --- | --- | ---
 active | boolean | default: true
 banned | boolean | default: true
-orderby | string | valid keys: username, creation, branchCount, lastOnline
+orderby | string | valid keys: username, creation, nodeCount, lastOnline
 
 
 ### Get one user
@@ -156,7 +156,7 @@ url | string
   Description: string,
   Language: string,
   Subtitle: Subtitle,
-  Branches: Branch[]
+  Nodes: Node[]
 }
 ```
 ### Get one Subtitle Tree
@@ -169,7 +169,7 @@ url | string
 Name|Type|Notes
 --- | --- | ---
 language | string
-orderby | string | valid keys: creation, branchCount
+orderby | string | valid keys: creation, nodeCount
 
 ### Create
 `POST /trees`
@@ -180,7 +180,7 @@ Name|Type|Notes
 language | string | **required**
 description | string
 
-Will create a branch with an empty parentless commit inside as shown bellow, as to ensure a parentless commit is not accidentally created in any other way:
+Will create a node with an empty parentless commit inside as shown bellow, as to ensure a parentless commit is not accidentally created in any other way:
 ```
 {
     collaborators: [],
@@ -207,7 +207,7 @@ Will create a branch with an empty parentless commit inside as shown bellow, as 
 ### Get one Subtitle
 `GET /subtitle/:subtitle_id`
 
-Deleting a tree also deletes all the branches inside, and by extension all the commits, comments, changes, and collaborators.
+Deleting a tree also deletes all the nodes inside, and by extension all the commits, comments, changes, and collaborators.
 
 ### Create
 `POST /subtitles`
@@ -233,7 +233,7 @@ lines | Object[] | Example: `[{startTime: 0:00:05, endTime: 0:00:06, text: "Hi..
 
 No queries for Subtitle Line.
 
-# Branch
+# Node
 ```
 {
   Collaborators: Collaborator[],
@@ -243,8 +243,8 @@ No queries for Subtitle Line.
 }
 ```
 
-### List branches
-`GET /branches`
+### List nodes
+`GET /nodes`
 (and nested paths)
 
 ##### Parameters:
@@ -253,12 +253,12 @@ Name|Type|Notes
 orderby | string | valid keys: status, deleted, collaboratorCount, commitCount
 
 
-### Get one branch
-`GET /branch/:branch_id`
+### Get one node
+`GET /node/:node_id`
 (and nested paths)
 
 ### Update
-`PATCH /branch/:branch_id`
+`PATCH /node/:node_id`
 (and nested paths)
 
 ##### Input:
@@ -268,14 +268,14 @@ status | string
 deleted | boolean
 
 ### Create
-`POST /trees/:tree_id/branches/`
+`POST /trees/:tree_id/nodes/`
 
 `status` is `UNMODIFIED` by default. Assigning `MERGED` status is only through the merge query.
 
-### Merge branches
-`POST trees/:tree_id/branches/:branch_id/merge/:target_branch_id`
+### Merge nodes
+`POST trees/:tree_id/nodes/:node_id/merge/:target_node_id`
 
-Target branch must be approved otherwise 400 Bad Request.
+Target node must be approved otherwise 400 Bad Request.
 
 # Commit
 ```
@@ -315,7 +315,7 @@ description | string
 
 
 ### Create
-`POST /branch/:branch_id/commit`
+`POST /node/:node_id/commit`
 (and nested paths)
 
 ##### Input:
@@ -378,7 +378,7 @@ data | Object | **required**
 }
 ```
 ### Add a user as a collaborator
-`PUT /branches/:branch_id/collaborators/:user_id`
+`PUT /nodes/:node_id/collaborators/:user_id`
 (and nested paths)
 
 ##### Parameters:
@@ -386,7 +386,7 @@ Name|Type|Notes
 --- | --- | ---
 admin | boolean | default: false
 
-Also adds the branch in the user's branch field.
+Also adds the node in the user's node field.
 
 
 ### Update
@@ -400,10 +400,10 @@ admin | boolean
 banned | boolean
 
 ### Delete
-`DELETE /branches/:branch_id/collaborators/:collaborator_id`
+`DELETE /nodes/:node_id/collaborators/:collaborator_id`
 (and nested paths)
 
-Also deletes the reference in the branch.
+Also deletes the reference in the node.
 
 # Comment
 ```

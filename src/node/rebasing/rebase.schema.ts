@@ -1,10 +1,10 @@
 import { Document, Schema } from 'mongoose';
-import { Branch, BranchSchema } from '../branch.schema'
+import { Node, NodeSchema } from '../node.schema'
 import { Change } from '../../change/change.schema'
 
 export interface Rebase extends Document {
-  sourceBranch: Branch;
-  targetLineBranch_ids: Schema.Types.ObjectId;
+  sourceNode: Node;
+  targetLineNode_ids: Schema.Types.ObjectId;
   rebaseData: RebaseData;
   tree_id: Schema.Types.ObjectId;
   conflictsStatus: string;
@@ -22,13 +22,13 @@ export interface Conflict {
 }
 
 export const RebaseSchema = new Schema({
-  sourceBranch: {
-    type: BranchSchema,
+  sourceNode: {
+    type: NodeSchema,
     required: true
   },
-  targetLineBranch_ids: {
+  targetLineNode_ids: {
     type: [Schema.Types.ObjectId],
-    ref: 'Branch',
+    ref: 'Node',
     required: true
   },
   tree_id: {

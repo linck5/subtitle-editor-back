@@ -1,10 +1,10 @@
 import { Document, Schema } from 'mongoose';
-import { Branch } from '../branch/branch.schema'
+import { Node } from '../node/node.schema'
 var mongoosePaginate = require('mongoose-paginate');
 
 export interface Commit extends Document {
   description: string;
-  branch_id: Schema.Types.ObjectId;
+  node_id: Schema.Types.ObjectId;
   done: boolean;
   comment_ids: Schema.Types.ObjectId[];
   creation: Date;
@@ -15,9 +15,9 @@ export const CommitSchema = new Schema({
   description: {
     type: String,
   },
-  branch_id: {
+  node_id: {
     type: Schema.Types.ObjectId,
-    ref: 'Branch',
+    ref: 'Node',
     index: true
   },
   done: {

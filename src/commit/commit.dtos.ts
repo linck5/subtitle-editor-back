@@ -11,7 +11,7 @@ export class CreateCommitDTO {
 
   @IsDefined()
   @IsMongoId()
-  readonly branch_id: string;
+  readonly node_id: string;
 }
 
 export class UpdateCommitDTO {
@@ -42,4 +42,4 @@ export class ListCommitDTO {
 }
 
 export const commitOrderByParams =
-['branch']
+['node']

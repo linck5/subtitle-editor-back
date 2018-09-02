@@ -1,7 +1,7 @@
 import { Model, PaginateModel, PaginateResult, PaginateOptions,
   ModelFindByIdAndUpdateOptions, Schema } from 'mongoose';
 import { Injectable, Inject } from '@nestjs/common';
-import { Branch } from './branch.schema';
+import { Node } from './node.schema';
 import { Tree } from '../tree/tree.schema';
 import { User } from '../user/user.schema';
 import { Commit } from '../commit/commit.schema';
@@ -9,17 +9,17 @@ import { Change } from '../change/change.schema';
 import { Rebase } from './rebasing/rebase.schema';
 import { RebaseService } from './rebasing/rebase.service';
 import { Collaborator } from './collaborator/collaborator.schema';
-import { CreateBranchDTO, UpdateBranchDTO, ListBranchDTO } from './branch.dtos';
+import { CreateNodeDTO, UpdateNodeDTO, ListNodeDTO } from './node.dtos';
 
 import { PaginationService } from '../common/pagination.service';
 
 @Injectable()
 // tslint:disable-next-line:component-class-suffix
-export class BranchService {
+export class NodeService {
 
     constructor(
-      @Inject('Branch') private readonly branchModel: Model<Branch>,
-      @Inject('Branch') private readonly paginateBranchModel: PaginateModel<Branch>,
+      @Inject('Node') private readonly nodeModel: Model<Node>,
+      @Inject('Node') private readonly paginateNodeModel: PaginateModel<Node>,
       @Inject('Tree') private readonly treeModel: Model<Tree>,
       @Inject('Commit') private readonly commitModel: Model<Commit>,
       @Inject('Change') private readonly changeModel: Model<Change>,
@@ -30,7 +30,7 @@ export class BranchService {
     ) { }
 
 
-    async Create(dto:CreateBranchDTO): Promise<Branch> {
+    async Create(dto:CreateNodeDTO): Promise<Node> {
 
 
       const Tree:Tree = await this.treeModel.findById(dto.tree_id);
@@ -44,13 +44,13 @@ export class BranchService {
       });
 
 
-      // any new branch is created on top of the mainline,
+      // any new node is created on top of the mainline,
       // so the base mainline index is the last index of the mainline
-      // in the current state of this branch's creation
+      // in the current state of this node's creation
       const mainlineBaseIndex:number = Tree.mainlineLength - 1;
 
-      // create the branch itself
-      const NewBranch = new this.branchModel({
+      // create the node itself
+      const NewNode = new this.nodeModel({
         collaborators: [CreatorAsCollaborator],
         status: "UNMODIFIED",
         deleted: false,
@@ -58,41 +58,41 @@ export class BranchService {
         mlBaseIndex: mainlineBaseIndex
       });
 
-      // put a reference to the branch in the user
-      Creator.branch_ids.push(NewBranch._id);
+      // put a reference to the node in the user
+      Creator.node_ids.push(NewNode._id);
       await Creator.save();
 
-      await NewBranch.save();
+      await NewNode.save();
 
-      return NewBranch;
+      return NewNode;
     }
 
-    async CreateRebasedBranch(tree:Tree, rebase:Rebase): Promise<Branch>{
+    async CreateRebasedNode(tree:Tree, rebase:Rebase): Promise<Node>{
 
       const mainlineBaseIndex:number = tree.mainlineLength - 1;
 
-      // create the branch itself
-      const rebasedBranch = new this.branchModel({
+      // create the node itself
+      const rebasedNode = new this.nodeModel({
         status: "REBASED",
         deleted: false,
         tree_id: tree._id,
         mlBaseIndex: mainlineBaseIndex,
         isInMainline: true,
-        source_id: rebase.sourceBranch._id
+        source_id: rebase.sourceNode._id
       });
-      await rebasedBranch.save();
+      await rebasedNode.save();
 
       const rebasedCommit = new this.commitModel({
         description: "rebase",
         done: true,
-        branch_id: rebasedBranch._id
+        node_id: rebasedNode._id
       });
       await rebasedCommit.save();
 
       let rebasedChanges:Change[] = [];
       for(const change of rebase.rebaseData){
         const rebasedChange = new this.changeModel(change);
-        rebasedChange.branch_id = rebasedBranch._id;
+        rebasedChange.node_id = rebasedNode._id;
         rebasedChange.commit_id = rebasedCommit._id;
         rebasedChanges.push(rebasedChange);
       }
@@ -100,25 +100,25 @@ export class BranchService {
       await this.changeModel.insertMany(rebasedChanges);
 
 
-      //this branch is being added to the mainline so its necessary
+      //this node is being added to the mainline so its necessary
       //to update the mainline length on the tree doc
       tree.mainlineLength++;
       await tree.save();
 
-      return rebasedBranch;
+      return rebasedNode;
 
 
     }
 
 
 
-    async Update(id, updateDto: UpdateBranchDTO): Promise<Branch | ApproveResponse> {
+    async Update(id, updateDto: UpdateNodeDTO): Promise<Node | ApproveResponse> {
       const options:ModelFindByIdAndUpdateOptions = {
         new: true, // true to return the modified document rather than the original
         runValidators: true
       }
 
-      const branch:Branch = await this.branchModel.findById(id);
+      const node:Node = await this.nodeModel.findById(id);
 
       if(updateDto.status == "APPROVED"){
 
@@ -126,17 +126,17 @@ export class BranchService {
 
           const resolvedRebase:Rebase = await this.rebaseService.Apply(updateDto.resolvedRebase);
 
-          return await this.Approve(branch, resolvedRebase);
+          return await this.Approve(node, resolvedRebase);
         }
         else{
-          return await this.Approve(branch);
+          return await this.Approve(node);
         }
 
       }
       else{
 
-        //TODO update the branch without finding by id again
-        let res =  await this.branchModel.findByIdAndUpdate(branch._id, updateDto, options);
+        //TODO update the node without finding by id again
+        let res =  await this.nodeModel.findByIdAndUpdate(node._id, updateDto, options);
         return res;
       }
 
@@ -144,25 +144,25 @@ export class BranchService {
 
     }
 
-    async Approve(branch:Branch, resolvedRebase?:Rebase): Promise<ApproveResponse>{
+    async Approve(node:Node, resolvedRebase?:Rebase): Promise<ApproveResponse>{
 
-      let tree:Tree = await this.treeModel.findById(branch.tree_id);
+      let tree:Tree = await this.treeModel.findById(node.tree_id);
 
       const pendingRebase:Rebase =
         await this.rebaseService.CheckForAPendingRebase(tree);
 
       if(pendingRebase){
         if(pendingRebase._id == resolvedRebase._id){
-          const rebasedBranch:Branch = await this.CreateRebasedBranch(tree, resolvedRebase);
+          const rebasedNode:Node = await this.CreateRebasedNode(tree, resolvedRebase);
 
-          branch.status = "APPROVED";
-          await branch.save();
+          node.status = "APPROVED";
+          await node.save();
 
           return {
             responseCode: 5,
             message: "Approved successfuly and rebased with given rebase data",
-            approvedBranch: branch,
-            rebasedBranch: rebasedBranch,
+            approvedNode: node,
+            rebasedNode: rebasedNode,
             rebase: resolvedRebase
           }
         }
@@ -174,24 +174,24 @@ export class BranchService {
           }
         }
       }
-      //check if the branch is based on the mainline leaf branch
-      if(branch.mlBaseIndex == tree.mainlineLength - 1){
-        branch.status = "APPROVED";
-        branch.isInMainline = true;
-        await branch.save();
+      //check if the node is based on the mainline leaf node
+      if(node.mlBaseIndex == tree.mainlineLength - 1){
+        node.status = "APPROVED";
+        node.isInMainline = true;
+        await node.save();
         tree.mainlineLength++;
         await tree.save();
 
         return {
           responseCode: 1,
           message: "Approved successfuly",
-          approvedBranch: branch
+          approvedNode: node
         }
 
       }
       //if not, a rebase is required
       else{
-        let rebase:Rebase = await this.rebaseService.Create(tree, branch);
+        let rebase:Rebase = await this.rebaseService.Create(tree, node);
 
         if(rebase.conflictsStatus == "PENDING"){
           return {
@@ -201,19 +201,19 @@ export class BranchService {
           }
         }
         else{
-          const rebasedBranch = await this.CreateRebasedBranch(tree, rebase);
+          const rebasedNode = await this.CreateRebasedNode(tree, rebase);
 
           rebase.fulfilled = true;
           await rebase.save();
 
-          branch.status = "APPROVED";
-          await branch.save();
+          node.status = "APPROVED";
+          await node.save();
 
           return {
             responseCode: 2,
             message: "Approved successfuly and rebased",
-            approvedBranch: branch,
-            rebasedBranch: rebasedBranch,
+            approvedNode: node,
+            rebasedNode: rebasedNode,
             rebase: rebase
           }
         }
@@ -222,23 +222,23 @@ export class BranchService {
       }
     }
 
-    async Delete(id): Promise<Branch> {
-      return await this.branchModel.findByIdAndRemove(id);
+    async Delete(id): Promise<Node> {
+      return await this.nodeModel.findByIdAndRemove(id);
     }
 
-    async GetById(id): Promise<Branch> {
-      return await this.branchModel.findById(id);
+    async GetById(id): Promise<Node> {
+      return await this.nodeModel.findById(id);
     }
 
 
-    async List(dto:ListBranchDTO): Promise<PaginateResult<Branch>> {
+    async List(dto:ListNodeDTO): Promise<PaginateResult<Node>> {
 
       let query:any = {};
       if(dto.isInMainline != undefined) query.isInMainline = dto.isInMainline;
 
       const options = this.paginationService.PaginateOptionsFromDto(dto);
 
-      return await this.paginateBranchModel.paginate(query, options);
+      return await this.paginateNodeModel.paginate(query, options);
 
     }
 
@@ -254,8 +254,8 @@ interface ApproveResponse {
   //5 - approved successfuly and rebased with given rebase data
   responseCode: 1 | 2 | 3 | 4 | 5;
   message: string;
-  approvedBranch?: Branch;
-  rebasedBranch?: Branch;
+  approvedNode?: Node;
+  rebasedNode?: Node;
   rebase?: Rebase;
   pendingRebase?: Rebase;
 }

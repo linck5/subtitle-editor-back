@@ -2,7 +2,7 @@ import { Model, PaginateModel, PaginateResult, Schema } from 'mongoose';
 import { Injectable, Inject } from '@nestjs/common';
 import { Change } from './change.schema';
 import { Tree } from '../tree/tree.schema';
-import { Branch } from '../branch/branch.schema';
+import { Node } from '../node/node.schema';
 import { CreateChangeDTO, ListChangeDTO } from './change.dtos';
 
 import { PaginationService } from '../common/pagination.service';
@@ -14,7 +14,7 @@ export class ChangeService {
     constructor(
       @Inject('Change') private readonly changeModel: Model<Change>,
       @Inject('Change') private readonly paginateChangeModel: PaginateModel<Change>,
-      @Inject('Branch') private readonly branchModel: Model<Branch>,
+      @Inject('Node') private readonly nodeModel: Model<Node>,
       @Inject('Tree') private readonly treeModel: Model<Tree>,
       private readonly paginationService: PaginationService
     ) { }
@@ -28,7 +28,7 @@ export class ChangeService {
       const NewChange = new this.changeModel({
         line_ids: change.line_ids,
         user_id: change.user_id,
-        branch_id: change.branch_id,
+        node_id: change.node_id,
         commit_id: change.commit_id,
         type: change.type,
         data: change.data
@@ -48,7 +48,7 @@ export class ChangeService {
 
       const tree:Tree = await this.treeModel.findById(tree_id);
 
-      const branch_ids:Schema.Types.ObjectId[] = (await this.branchModel.find({
+      const node_ids:Schema.Types.ObjectId[] = (await this.nodeModel.find({
         tree_id: tree._id,
         isInMainline: true
       }))
@@ -57,11 +57,11 @@ export class ChangeService {
 
       let orderedMainlineChanges:Change[] = [];
 
-      for(let branch_id of branch_ids){
-        const branchChanges:Change[] = await this.changeModel.find({
-          branch_id: branch_id
+      for(let node_id of node_ids){
+        const nodeChanges:Change[] = await this.changeModel.find({
+          node_id: node_id
         });
-        orderedMainlineChanges.push(...branchChanges);
+        orderedMainlineChanges.push(...nodeChanges);
       }
 
       return orderedMainlineChanges;

@@ -10,12 +10,12 @@ ct --> artt[Add a reference to the tree in the video]
 
 artt --> efrstt>User edits a subtitle]
 
-efrstt --> cb[Create a branch]
-cb --> sbcfb[Set the base commits for the branch]
-sbcfb --> arttu[Put a reference to the branch in the user]
-arttu --> acttb[Add a collaborator to the branch referencing the user]
-acttb --> sinpro[Set branch field `status` to IN_PROGRESS]
-sinpro --> cc[Create a new commit for the branch]
+efrstt --> cb[Create a node]
+cb --> sbcfb[Set the base commits for the node]
+sbcfb --> arttu[Put a reference to the node in the user]
+arttu --> acttb[Add a collaborator to the node referencing the user]
+acttb --> sinpro[Set node field `status` to IN_PROGRESS]
+sinpro --> cc[Create a new commit for the node]
 cc --> cch["Create a change referencing the commit, the user, and the line(s)"]
 
 
@@ -34,21 +34,21 @@ sdtt --> urapp>User requests approval]
 
 ustmnch --> cc
 
-urapp --> sinfin[Set branch field `status` to APPROVED]
+urapp --> sinfin[Set node field `status` to APPROVED]
 
 
-sinfin --> modapp>Mod approves the branch]
-sinfin --> moddontapp>Mod does not approve the branch]
+sinfin --> modapp>Mod approves the node]
+sinfin --> moddontapp>Mod does not approve the node]
 
-moddontapp --> sbinpro[Set branch field `status` back to IN_PROGRESS]
+moddontapp --> sbinpro[Set node field `status` back to IN_PROGRESS]
 
 sbinpro --> userfix>User makes more changes/fixes]
 userfix --> cc
 
 
 
-modapp --> mlempty{<center>is branch based<br/> on root branch?</center>}
-mlempty --> isbolam{<center>is branch<br/> based on last<br/> approved/merged branch?</center>}
+modapp --> mlempty{<center>is node based<br/> on root node?</center>}
+mlempty --> isbolam{<center>is node<br/> based on last<br/> approved/merged node?</center>}
 
 isbolam -->|no| fnca[Find nearest common ancestor]
 
@@ -61,14 +61,14 @@ cfl -->|no| mrg
 
 mdiff--> resolve>User resolves conflicts]
 
-resolve --> mrg[Create a branch with status `MERGED`<br/> and a commit with the merged changes]
+resolve --> mrg[Create a node with status `MERGED`<br/> and a commit with the merged changes]
 
 isbolam-->|yes| pushtoml
 mlempty -->|yes| pushtoml
 
-pushtoml[Push all commits of the branch to the mainline]
+pushtoml[Push all commits of the node to the mainline]
 
-pushtoml --> sbfinish[Set branch field `status` to FINISHED]
+pushtoml --> sbfinish[Set node field `status` to FINISHED]
 
 
 
@@ -81,18 +81,18 @@ graph TB
 
 Video -->|"[ ]"| Tree
 
-Branch -->|"{[ ]}"| Collaborator
-Branch -->|"base commmits[ ]"| Commit
-Branch -.->|"source"| Branch
-Branch --> Tree
+Node -->|"{[ ]}"| Collaborator
+Node -->|"base commmits[ ]"| Commit
+Node -.->|"source"| Node
+Node --> Tree
 
-Commit -->|"-i "| Branch
+Commit -->|"-i "| Node
 
 Change -->|"-i"| Commit
 Change --> User
 Change -->|"{[ ]}"| Line
 
-User -.->|"[ ]"| Branch
+User -.->|"[ ]"| Node
 
 Collaborator --> User
 
@@ -130,7 +130,7 @@ Tree {
 }
 ```
 ```
-Branch {
+Node {
   Collaborators: {Collaborator[]}
   BaseCommits: Commit[]
 
@@ -138,7 +138,7 @@ Branch {
 ```
 ```
 Commit {
-  Branch: Branch, -index
+  Node: Node, -index
 }
 ```
 ```
@@ -161,7 +161,7 @@ customId
 ```
 ```
 User {
-  Branches: Branch[]
+  Nodes: Node[]
 }
 ```
 ```
