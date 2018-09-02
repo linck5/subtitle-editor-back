@@ -136,6 +136,8 @@ describe('Api Tests', () => {
     let workingData = {
       tree1: null,
 
+      mlChanges1: null,
+
       branch1t1: null,
       commit1b1t1: null,
       change1c1b1t1: null,
@@ -523,22 +525,7 @@ describe('Api Tests', () => {
           }
         }).expect(201);
 
-        //no conflict: target changes don't touch line 15
-        await postChangeWithTemplate(templateChange, {
-          line_ids: [15],
-          type: "EDIT",
-          data: {
-            startTime: 50220
-          }
-        }).expect(201);
-
-        //no conflict: target changes don't touch line 16
-        await postChangeWithTemplate(templateChange, {
-          line_ids: [16],
-          type: "DELETE"
-        }).expect(201);
-
-        //no conflict: exact same text edit
+        //discarded: exact same text edit
         await postChangeWithTemplate(templateChange, {
           line_ids: [97],
           type: "EDIT",
@@ -558,11 +545,12 @@ describe('Api Tests', () => {
         }).expect(201);
 
         //conflict: target change edits end time on line 99
+        //and start and end time on line 98
         await postChangeWithTemplate(templateChange, {
           line_ids: [98, 99],
           type: "TIME_SHIFT",
           data: {
-            timeShift: 500100
+            timeShift: 100
           }
         }).expect(201);
 
@@ -604,6 +592,23 @@ describe('Api Tests', () => {
           }
         }).expect(201);
 
+        //no conflict: target changes don't touch line 190
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [190],
+          type: "EDIT",
+          data: {
+            startTime: 50220
+          }
+        }).expect(201);
+
+        //no conflict: target changes don't touch line 191
+        await postChangeWithTemplate(templateChange, {
+          line_ids: [191],
+          type: "DELETE"
+        }).expect(201);
+
+
+
         await request(server)
           .patch("/commit/" + commitRes.body._id)
           .send({
@@ -614,7 +619,7 @@ describe('Api Tests', () => {
 
       });
 
-      test("approving the branch", async ()=>{
+      test("if the rebase data is correct after approving the branch", async ()=>{
 
         await request(server)
           .patch("/branch/" + workingData.branch3t1._id)
@@ -631,23 +636,81 @@ describe('Api Tests', () => {
           })
           .expect(200);
 
-          console.log(JSON.stringify(res.body, null, 4))
-
-
           expect(res.body.responseCode).toBe(3);
 
           expect(res.body.rebase).toBeDefined();
-          expect(res.body.rebase.targetLineBranch_ids).toBe([workingData.branch4t1._id]);
+          expect(res.body.rebase.targetLineBranch_ids).toEqual(
+            [ workingData.branch2t1._id, workingData.branch4t1._id ]
+          );
 
-          // expect(res.body.approvedBranch.status).toBe("APPROVED");
-          // expect(res.body.approvedBranch.isInMainline).toBeFalsy();
-          // expect(res.body.approvedBranch.mlBaseIndex).toBe(0);
-          // expect(res.body.approvedBranch.source_id).toBeUndefined();
-          //
-          // expect(res.body.rebasedBranch.status).toBe("REBASED");
-          // expect(res.body.rebasedBranch.isInMainline).toBeTruthy();
-          // expect(res.body.rebasedBranch.mlBaseIndex).toBe(1);
-          // expect(res.body.rebasedBranch.source_id).toBe(res.body.approvedBranch._id);
+          expect(res.body.rebase.sourceBranch.status).toBe("FINISHED");
+          expect(res.body.rebase.sourceBranch.isInMainline).toBeFalsy();
+          expect(res.body.rebase.sourceBranch.mlBaseIndex).toBe(0);
+          expect(res.body.rebase.sourceBranch.source_id).toBeUndefined();
+
+          expect(res.body.rebase.rebaseData[0].conflictingLines).toEqual([5]);
+
+          expect(res.body.rebase.rebaseData[1].conflictingLines).toEqual([98]);
+          expect(res.body.rebase.rebaseData[1].conflictingDataTypes).toEqual(["startTime"]);
+
+          expect(res.body.rebase.rebaseData[2].conflictingLines).toEqual([98,99]);
+          expect(res.body.rebase.rebaseData[2].targetChanges.length).toBe(2);
+
+          expect(res.body.rebase.rebaseData[3].conflictingLines).toEqual([101]);
+
+          expect(res.body.rebase.rebaseData[4].conflictingLines).toEqual([104, 106]);
+          expect(res.body.rebase.rebaseData[4].targetChanges.length).toBe(2);
+
+          expect(res.body.rebase.rebaseData[5].conflictingLines).toEqual([151, 152]);
+
+          expect(res.body.rebase.rebaseData[6].conflictingLines).toBeUndefined();
+
+          expect(res.body.rebase.rebaseData[7].conflictingLines).toBeUndefined();
+
+          expect(res.body.rebase.rebaseData[8].conflictingLines).toBeUndefined();
+
+
+
+      });
+
+
+    });
+
+    describe("Get all the mainline changes", ()=>{
+
+      it("gets all the correct changes in the correct order", async ()=>{
+        let res = await request(server)
+          .get("/changes/mainline/" + workingData.tree1._id)
+          .expect(200);
+
+        expect(res.body.length).toBe(11);
+
+        expect(res.body[0].line_ids).toEqual(workingData.change1c1b2t1.line_ids);
+        expect(res.body[0].type).toEqual(workingData.change1c1b2t1.type);
+        expect(res.body[0].data).toEqual(workingData.change1c1b2t1.data);
+
+        expect(res.body[1].line_ids).toEqual(workingData.change1c1b1t1.line_ids);
+        expect(res.body[1].type).toEqual(workingData.change1c1b1t1.type);
+        expect(res.body[1].data).toEqual(workingData.change1c1b1t1.data);
+
+        workingData.mlChanges1 = res.body;
+
+      });
+
+
+    });
+
+    describe("Apply a list of changes to a subtitle", ()=>{
+
+      test("if the applied subtitle is correct", async ()=>{
+        let res = await request(server)
+          .get("/subtitle/apply/" + testData.subtitles.subtitle1._id)
+          .send({
+            changes: workingData.mlChanges1
+          })
+          .expect(200);
+
+          //TODO verif the subtitle
 
       });
 
