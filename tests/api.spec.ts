@@ -139,16 +139,20 @@ describe('Api Tests', () => {
       mlChanges1: null,
 
       node1t1: null,
-      commit1b1t1: null,
-      change1c1b1t1: null,
+      commit1n1t1: null,
+      change1c1n1t1: null,
 
       node2t1: null,
-      commit1b2t1: null,
-      change1c1b2t1: null,
+      commit1n2t1: null,
+      change1c1n2t1: null,
 
       node3t1: null,
+      rebase1n3t1: null,
 
-      node4t1: null
+      node4t1: null,
+
+      node5t1: null,
+      commit1n5t1: null
     }
 
     describe("tree creation and first node with a commit and a change", ()=>{
@@ -194,7 +198,7 @@ describe('Api Tests', () => {
           })
           .expect(201);
 
-        workingData.commit1b1t1 = res.body;
+        workingData.commit1n1t1 = res.body;
 
       });
 
@@ -205,7 +209,7 @@ describe('Api Tests', () => {
           .send({
             line_ids: [5],
             user_id: testData.users.user1._id,
-            commit_id: workingData.commit1b1t1._id,
+            commit_id: workingData.commit1n1t1._id,
             node_id: workingData.node1t1._id,
             type: "EDIT",
             data: {
@@ -214,7 +218,7 @@ describe('Api Tests', () => {
           })
           .expect(201);
 
-        workingData.change1c1b1t1 = res.body;
+        workingData.change1c1n1t1 = res.body;
 
       });
 
@@ -222,7 +226,7 @@ describe('Api Tests', () => {
 
         const templateChange:any = {
           user_id: testData.users.user1._id,
-          commit_id: workingData.commit1b1t1._id,
+          commit_id: workingData.commit1n1t1._id,
           node_id: workingData.node1t1._id
         };
 
@@ -294,11 +298,12 @@ describe('Api Tests', () => {
       });
 
     });
+
     describe("Another node that will be used in a later test",()=>{
 
       it("should /POST a node", async () => {
 
-        let node = await request(server)
+        let res = await request(server)
           .post("/nodes")
           .send({
             creator_id: testData.users.user1._id,
@@ -306,10 +311,58 @@ describe('Api Tests', () => {
           })
         .expect(201);
 
-        workingData.node3t1 = node.body;
+        workingData.node3t1 = res.body;
 
       });
 
+    });
+
+    describe("Yet another node for later tests",()=>{
+
+      it("should /POST a node", async () => {
+
+        let res = await request(server)
+          .post("/nodes")
+          .send({
+            creator_id: testData.users.user1._id,
+            tree_id: workingData.tree1._id
+          })
+        .expect(201);
+
+        workingData.node5t1 = res.body;
+
+      });
+
+      it("should /POST a commit", async () => {
+
+
+        let res = await request(server)
+          .post("/commits")
+          .send({
+            description: "",
+            node_id: workingData.node5t1._id
+          })
+          .expect(201);
+
+        workingData.commit1n5t1 = res.body;
+
+      });
+
+      it("should /POST a change", async () => {
+
+        let res = await request(server)
+          .post("/changes")
+          .send({
+            line_ids: [88],
+            user_id: testData.users.user1._id,
+            commit_id: workingData.commit1n5t1._id,
+            node_id: workingData.node5t1._id,
+            type: "TIME_SHIFT",
+            data: { timeShift: 50 }
+          })
+          .expect(201);
+
+        });
     });
 
     describe("Finishing and approving another node",()=>{
@@ -340,7 +393,7 @@ describe('Api Tests', () => {
           })
           .expect(201);
 
-        workingData.commit1b2t1 = res.body;
+        workingData.commit1n2t1 = res.body;
 
       });
 
@@ -355,7 +408,7 @@ describe('Api Tests', () => {
               36,37,38,39,40
             ],
             user_id: testData.users.user1._id,
-            commit_id: workingData.commit1b2t1._id,
+            commit_id: workingData.commit1n2t1._id,
             node_id: workingData.node2t1._id,
             type: "TIME_SHIFT",
             data: {
@@ -364,7 +417,7 @@ describe('Api Tests', () => {
           })
           .expect(201);
 
-        workingData.change1c1b2t1 = res.body;
+        workingData.change1c1n2t1 = res.body;
 
       });
 
@@ -372,7 +425,7 @@ describe('Api Tests', () => {
 
 
         let res = await request(server)
-          .patch("/commit/" + workingData.commit1b2t1._id)
+          .patch("/commit/" + workingData.commit1n2t1._id)
           .send({
             description: "ajusted the timing",
             done: true
@@ -482,15 +535,11 @@ describe('Api Tests', () => {
       });
 
       test("tree should have 3 nodes in mainline", async () => {
-
         let res = await request(server)
           .get("/tree/" + workingData.tree1._id)
           .expect(200);
 
-        const tree = res.body;
-        expect(tree.mainlineLength).toBe(3);
-
-
+        expect(res.body.mainlineLength).toBe(3);
       });
 
 
@@ -619,7 +668,7 @@ describe('Api Tests', () => {
 
       });
 
-      test("if the rebase data is correct after approving the node", async ()=>{
+      test("if the rebase data is correct after trying to approve the node", async ()=>{
 
         await request(server)
           .patch("/node/" + workingData.node3t1._id)
@@ -639,6 +688,7 @@ describe('Api Tests', () => {
           expect(res.body.responseCode).toBe(3);
 
           expect(res.body.rebase).toBeDefined();
+          expect(res.body.rebase.fulfilled).toBeFalsy();
           expect(res.body.rebase.targetLineNode_ids).toEqual(
             [ workingData.node2t1._id, workingData.node4t1._id ]
           );
@@ -669,10 +719,119 @@ describe('Api Tests', () => {
 
           expect(res.body.rebase.rebaseData[8].conflictingLines).toBeUndefined();
 
+          workingData.rebase1n3t1 = res.body.rebase;
+
 
 
       });
 
+
+      test("trying to approve another node with the rebase pending", async ()=>{
+
+        let res = await request(server)
+          .patch("/node/" + workingData.node5t1._id)
+          .send({
+            status: "APPROVED"
+          })
+          .expect(200);
+
+
+          expect(res.body.responseCode).toBe(4);
+          expect(res.body.pendingRebase._id).toBe(workingData.rebase1n3t1._id);
+      });
+
+      test("solving the conflicts incorrectly", async ()=>{
+
+        let res1 = await request(server)
+          .patch("/node/" + workingData.node5t1._id)
+          .send({
+            status: "APPROVED",
+            resolvedRebase: workingData.rebase1n3t1
+          })
+          .expect(400);
+
+        expect(res1.body.code).toBe("validationError");
+
+        //make a rebase with correct format but with conflicts
+
+        let notResolvedRebase = {
+          rebaseData: workingData.rebase1n3t1.rebaseData,
+          rebaseId: workingData.rebase1n3t1._id
+        }
+
+        let res2 = await request(server)
+          .patch("/node/" + workingData.node5t1._id)
+          .send({
+            status: "APPROVED",
+            resolvedRebase: notResolvedRebase
+          })
+          .expect(400);
+
+        expect(res2.body.code).toBe("validationError");
+
+
+
+
+
+      });
+
+      test("solving the conflicts correctly", async ()=>{
+
+        let resolvedRebaseData = []
+        let conflictNumber = 0;
+        for(let changeOrConflict of workingData.rebase1n3t1.rebaseData){
+          let changeToPush;
+
+          if(changeOrConflict.conflictingLines){
+            //don't push the first and third change to test if the Api
+            //can handle that
+            if(conflictNumber != 0 && conflictNumber != 2){
+              changeToPush = changeOrConflict.sourceChange;
+            }
+            conflictNumber++;
+          }
+          else{
+            changeToPush = changeOrConflict;
+          }
+
+          if(changeToPush){
+            if(changeToPush.__v != undefined)
+              changeToPush.__v = undefined;
+
+            resolvedRebaseData.push(changeToPush);
+          }
+        }
+
+        let resolvedRebase = {
+          rebaseData: resolvedRebaseData,
+          rebaseId: workingData.rebase1n3t1._id
+        }
+
+        console.log(resolvedRebase);
+
+        let res = await request(server)
+          .patch("/node/" + workingData.node5t1._id)
+          .send({
+            status: "APPROVED",
+            resolvedRebase: resolvedRebase
+          })
+          .expect(200);
+
+        expect(res.body.responseCode).toBe(5);
+        expect(res.body.rebase.fulfilled).toBeTruthy();
+        expect(res.body.rebasedNode.isInMainline).toBeTruthy();
+
+      });
+
+
+      test("tree should have 4 nodes in mainline", async () => {
+
+        let res = await request(server)
+          .get("/tree/" + workingData.tree1._id)
+          .expect(200);
+
+        expect(res.body.mainlineLength).toBe(4);
+      });
 
     });
 
@@ -683,15 +842,15 @@ describe('Api Tests', () => {
           .get("/changes/mainline/" + workingData.tree1._id)
           .expect(200);
 
-        expect(res.body.length).toBe(11);
+        expect(res.body.length).toBe(18);
 
-        expect(res.body[0].line_ids).toEqual(workingData.change1c1b2t1.line_ids);
-        expect(res.body[0].type).toEqual(workingData.change1c1b2t1.type);
-        expect(res.body[0].data).toEqual(workingData.change1c1b2t1.data);
+        expect(res.body[0].line_ids).toEqual(workingData.change1c1n2t1.line_ids);
+        expect(res.body[0].type).toEqual(workingData.change1c1n2t1.type);
+        expect(res.body[0].data).toEqual(workingData.change1c1n2t1.data);
 
-        expect(res.body[1].line_ids).toEqual(workingData.change1c1b1t1.line_ids);
-        expect(res.body[1].type).toEqual(workingData.change1c1b1t1.type);
-        expect(res.body[1].data).toEqual(workingData.change1c1b1t1.data);
+        expect(res.body[1].line_ids).toEqual(workingData.change1c1n1t1.line_ids);
+        expect(res.body[1].type).toEqual(workingData.change1c1n1t1.type);
+        expect(res.body[1].data).toEqual(workingData.change1c1n1t1.data);
 
         workingData.mlChanges1 = res.body;
 
@@ -710,7 +869,7 @@ describe('Api Tests', () => {
           })
           .expect(200);
 
-          //TODO verif the subtitle
+          //TODO verify the subtitle
 
       });
 

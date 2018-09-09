@@ -28,7 +28,7 @@ export class UpdateNodeDTO {
 
   @ValidateNested()
   @Type(() => ResolvedRebaseDTO)
-  readonly resolvedRebase: ResolvedRebaseDTO;
+  readonly resolvedrebase: ResolvedRebaseDTO;
 
   @ValidateNested({ each: true })
   @Type(() => UpdateNodeCollaboratorDTO)

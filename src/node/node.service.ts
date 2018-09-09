@@ -119,12 +119,11 @@ export class NodeService {
       }
 
       const node:Node = await this.nodeModel.findById(id);
-
       if(updateDto.status == "APPROVED"){
 
-        if(updateDto.resolvedRebase){
+        if(updateDto.resolvedrebase){
 
-          const resolvedRebase:Rebase = await this.rebaseService.Apply(updateDto.resolvedRebase);
+          const resolvedRebase:Rebase = await this.rebaseService.Apply(updateDto.resolvedrebase);
 
           return await this.Approve(node, resolvedRebase);
         }
@@ -152,11 +151,15 @@ export class NodeService {
         await this.rebaseService.CheckForAPendingRebase(tree);
 
       if(pendingRebase){
-        if(pendingRebase._id == resolvedRebase._id){
+        if(resolvedRebase && resolvedRebase._id && pendingRebase._id.equals(resolvedRebase._id)){
+
           const rebasedNode:Node = await this.CreateRebasedNode(tree, resolvedRebase);
 
           node.status = "APPROVED";
           await node.save();
+
+          resolvedRebase.fulfilled = true;
+          await resolvedRebase.save();
 
           return {
             responseCode: 5,

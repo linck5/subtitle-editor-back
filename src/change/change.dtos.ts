@@ -1,5 +1,5 @@
 
-import { IsString, IsInt, IsDate, IsMongoId, ValidateNested, IsNumber,
+import { IsString, IsInt, IsDateString, IsMongoId, ValidateNested, IsNumber,
   IsDefined, Matches } from 'class-validator';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 import { Schema } from 'mongoose';
@@ -42,6 +42,10 @@ export class CreateChangeDTO {
 export class RebasedChangeDTO {
 
   @IsDefined()
+  @IsMongoId()
+  readonly _id: Schema.Types.ObjectId;
+
+  @IsDefined()
   @IsInt({each: true})
   readonly line_ids: number[];
 
@@ -62,8 +66,8 @@ export class RebasedChangeDTO {
   readonly type: string;
 
   @IsDefined()
-  @IsDate()
-  readonly creation: Date;
+  @IsDateString()
+  readonly creation: string;
 
   @ValidateNested()
   @Type(() => ChangeDataDTO)

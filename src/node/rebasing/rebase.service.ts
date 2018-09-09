@@ -26,7 +26,7 @@ export class RebaseService {
     if(!rebase) rebase = await this.rebaseModel.findById(resolvedRebaseDto.rebaseId);
     if(!tree) tree = await this.treeModel.findById(rebase.tree_id)
 
-    let resolvedChanges:Change[] = []
+    let resolvedChanges:Change[] = [];
 
     for(let rebaseDataElement of resolvedRebaseDto.rebaseData){
 
@@ -42,7 +42,16 @@ export class RebaseService {
       }
     }
 
-    rebase.rebaseData = resolvedChanges;
+    rebase.rebaseData = [];
+    //push keys with change_id field instead of _id
+    //to avoid duplicate keys
+    for(let resolvedChange of resolvedChanges){
+      let change:any = resolvedChange;
+      change.change_id = resolvedChange._id;
+      change._id = undefined;
+      rebase.rebaseData.push(change);
+    }
+
     rebase.conflictsStatus = "RESOLVED";
     await rebase.save();
     return rebase;
