@@ -1,7 +1,7 @@
 import { Controller, Post, HttpStatus, Param, Get, Body, Delete,
   HttpException } from '@nestjs/common';
 import { SubtitleService } from './subtitle.service';
-import { CreateSubtitleDTO, CreateSubtitleFromASSFileDTO,
+import { CreateSubtitleFromASSFileDTO,
 ApplySubtitleDTO} from './subtitle.dtos';
 
 @Controller()
@@ -30,15 +30,6 @@ export class SubtitleController {
     });
   }
 
-  @Post('/subtitles')
-  async Create( @Body() addSubtitleDTO:CreateSubtitleDTO) {
-    return await this.subtitleService.Create(addSubtitleDTO)
-    .catch(err => {
-      throw new HttpException({
-        error: err
-      }, HttpStatus.BAD_REQUEST);
-    });
-  }
 
   @Post('/subtitles/fromAss')
   async CreateFromASSFile( @Body() dto:CreateSubtitleFromASSFileDTO) {

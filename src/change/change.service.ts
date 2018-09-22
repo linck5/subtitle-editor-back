@@ -21,20 +21,20 @@ export class ChangeService {
 
     onModuleInit() { }
 
-    async Create(change: CreateChangeDTO): Promise<Change> {
-
-      //TODO should I verify here if the user is actually a collaborator and is authorized to make this change?
-
-      const NewChange = new this.changeModel({
-        line_ids: change.line_ids,
-        user_id: change.user_id,
-        node_id: change.node_id,
-        commit_id: change.commit_id,
-        type: change.type,
-        data: change.data
-      });
-      return await NewChange.save();
-    }
+    // async Create(change: CreateChangeDTO): Promise<Change> {
+    //
+    //   //TODO should I verify here if the user is actually a collaborator and is authorized to make this change?
+    //
+    //   const NewChange = new this.changeModel({
+    //     line_ids: change.line_ids,
+    //     user_id: change.user_id,
+    //     node_id: change.node_id,
+    //     commit_id: change.commit_id,
+    //     type: change.type,
+    //     data: change.data
+    //   });
+    //   return await NewChange.save();
+    // }
 
     async Delete(id): Promise<Change> {
       return await this.changeModel.findByIdAndRemove(id);

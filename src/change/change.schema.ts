@@ -1,29 +1,16 @@
 import { Document, Schema } from 'mongoose';
-import { User } from '../user/user.schema';
 var mongoosePaginate = require('mongoose-paginate');
 
 export interface Change extends Document {
-  line_ids: number[];
   user_id: Schema.Types.ObjectId;
   commit_id: Schema.Types.ObjectId;
   node_id: Schema.Types.ObjectId;
   creation: Date;
-  type: string;
-  data: {
-    startTime: number;
-    endTime: number;
-    text: string;
-    //position? //TODO
-    timeShift: number;
-  }
-
+  operation: string;
+  data: any;
 }
 
 export const ChangeSchema = new Schema({
-  line_ids: [{
-    type: Number,
-    required: true
-  }],
   user_id: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -45,26 +32,26 @@ export const ChangeSchema = new Schema({
     type: Date,
     default: Date.now()
   },
-  type: {
+  operation: {
     type: String,
     enum: ["CREATE", "EDIT", "TIME_SHIFT", "DELETE"],
     required: true
   },
   data: {
-    startTime: {
-      type: Number
-    },
-    endTime: {
-      type: Number
-    },
-    text: {
-      type: String
-    },
-    //position? //TODO
-    timeShift: {
-      type: Number
-    }
+    type: Object,
   }
 
 });
 ChangeSchema.plugin(mongoosePaginate);
+
+// const c = {
+//   line_ids: [5],
+//   user_id: '5349b4ddd2781d08c09890f3',
+//   commit_id: '5349b4ddd2781d08c09890m4',
+//   node_id: '5349b4ddd2781d08c09890cc',
+//   operation: "EDIT",
+//   data: {
+//
+//     text: "普通な漢字"
+//   }
+// }

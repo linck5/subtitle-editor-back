@@ -15,10 +15,8 @@ export interface Rebase extends Document {
 export type RebaseData = (Change | Conflict)[];
 
 export interface Conflict {
-  conflictingLines:Array<number>;
   sourceChange:Change;
   targetChanges:Change[];
-  conflictingDataTypes:Array<string>;
 }
 
 export const RebaseSchema = new Schema({

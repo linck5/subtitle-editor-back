@@ -1,30 +1,28 @@
 import { Document, Schema } from 'mongoose';
-import { Line, LineSchema } from './line/line.schema';
-
 
 
 export interface Subtitle extends Document {
   format: string;
   original: string;
-  lines: Line[];
-  lastId: number;
-}
+  data: any;
+};
+
+export const SubtitleFormats = {
+  ASS: 'ASS'
+};
 
 export const SubtitleSchema = new Schema({
 
   format: {
-    type: String
+    type: String,
+    enum: [SubtitleFormats.ASS]
   },
   original: {
     type: String
   },
-  lines: {
-    type: [LineSchema],
+  data: {
+    type: Object,
     required: true
   },
-  lastId: {
-    type: Number,
-    required: true
-  }
 
 });

@@ -11,8 +11,26 @@ import { Type } from 'class-transformer';
 export class CreateChangeDTO {
 
   @IsDefined()
-  @IsInt({each: true})
-  readonly line_ids: number[];
+  @IsMongoId()
+  readonly user_id: Schema.Types.ObjectId;
+
+  @IsDefined()
+  @IsMongoId()
+  readonly commit_id: Schema.Types.ObjectId;
+
+  @IsDefined()
+  @IsMongoId()
+  readonly node_id: Schema.Types.ObjectId;
+
+  @IsDefined()
+  @IsString()
+  @Matches(/(?:CREATE)|(?:EDIT)|(?:TIME_SHIFT)|(?:DELETE)/)
+  readonly type: string;
+
+}
+
+
+export class RebasedChangeDTO {
 
   @IsDefined()
   @IsMongoId()
@@ -31,47 +49,9 @@ export class CreateChangeDTO {
   @Matches(/(?:CREATE)|(?:EDIT)|(?:TIME_SHIFT)|(?:DELETE)/)
   readonly type: string;
 
-
-  @ValidateNested()
-  @Type(() => ChangeDataDTO)
-  readonly data: ChangeDataDTO;
-
-}
-
-
-export class RebasedChangeDTO {
-
-  @IsDefined()
-  @IsMongoId()
-  readonly _id: Schema.Types.ObjectId;
-
-  @IsDefined()
-  @IsInt({each: true})
-  readonly line_ids: number[];
-
-  @IsDefined()
-  @IsMongoId()
-  readonly user_id: Schema.Types.ObjectId;
-
-  @IsDefined()
-  @IsMongoId()
-  readonly commit_id: Schema.Types.ObjectId;
-
-  @IsDefined()
-  @IsMongoId()
-  readonly node_id: Schema.Types.ObjectId;
-
-  @IsDefined()
-  @IsString()
-  readonly type: string;
-
   @IsDefined()
   @IsDateString()
   readonly creation: string;
-
-  @ValidateNested()
-  @Type(() => ChangeDataDTO)
-  readonly data: ChangeDataDTO;
 
 }
 
@@ -97,23 +77,4 @@ export class ListOrderedMainlineChanges {
 
   @IsMongoId()
   readonly tree_id: Schema.Types.ObjectId;;
-}
-
-
-export class ChangeDataDTO {
-
-  @IsNumber()
-  readonly startTime: number; //milliseconds
-
-  @IsNumber()
-  readonly endTime: number; //milliseconds
-
-  @IsString()
-  readonly text: string;
-
-
-  @IsNumber()
-  readonly timeShift: number; //milliseconds
-
-  //position? //TODO
 }

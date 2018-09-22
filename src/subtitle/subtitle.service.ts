@@ -1,10 +1,10 @@
 import { Model } from 'mongoose';
 import { Injectable, Inject } from '@nestjs/common';
-import { CreateSubtitleDTO } from './subtitle.dtos';
-import { Subtitle } from './subtitle.schema';
-import { Line } from './line/line.schema';
+import { Subtitle, SubtitleFormats } from './subtitle.schema';
 import { Change } from '../change/change.schema';
 import { AssConverterService } from './assConverter.service';
+import { AssChangeHandler } from './ass/changeHandler';
+import { AssSubtitle } from './ass/format';
 
 @Injectable()
 // tslint:disable-next-line:component-class-suffix
@@ -12,32 +12,8 @@ export class SubtitleService {
 
     constructor(
       @Inject('Subtitle') private readonly subtitleModel: Model<Subtitle>,
-      @Inject('Line') private readonly lineModel: Model<Line>,
       private readonly assConverterService: AssConverterService
     ) { }
-
-    async Create(subtitle: CreateSubtitleDTO): Promise<Subtitle> {
-
-      let lines = []
-      let lastId = -1;
-
-      for(let line of subtitle.lines){
-        lines.push(new this.lineModel({
-          id: ++lastId,
-          startTime: line.startTime,
-          endTime: line.endTime,
-          text: line.text
-        }))
-      }
-
-
-
-      const NewSubtitle = new this.subtitleModel({
-        lines: lines,
-        lastId: lastId
-      });
-      return await NewSubtitle.save();
-    }
 
     async CreateFromASSFile(assFile: any): Promise<Subtitle> {
 
@@ -57,62 +33,15 @@ export class SubtitleService {
 
       let sub:Subtitle = await this.subtitleModel.findById(subId);
 
-      for (const change of changes){
-
-        if(change.type == "CREATE"){
-
-          let isMissingProp = false;
-          for(const prop of ["startTime", "endTime", "text"]){
-            if(change.data[prop] == undefined)
-              isMissingProp = true;
-          }
-          if(isMissingProp) continue;
-
-          sub.lines.push(
-            new this.lineModel({
-              id: ++sub.lastId,
-              startTime: change.data.startTime,
-              endTime: change.data.endTime,
-              text: change.data.text
-            })
-          )
-        }
-        else {
-
-          const targetLines:Line[] = sub.lines.filter(line =>
-            change.line_ids.some(id => id == line.id));
-
-          for (const targetLine of targetLines){
-
-            const subLineIndex = sub.lines.indexOf(targetLine)
-
-            if(!subLineIndex) continue;
-
-            let subLine = sub.lines[subLineIndex];
-
-            switch(change.type){
-              case "DELETE":
-                const indefOfTargetLine = sub.lines.indexOf(targetLine);
-                if(indefOfTargetLine != -1){
-                  sub.lines.splice(indefOfTargetLine, 1);
-                }
-                break;
-              case "EDIT":
-                for(const prop of ["startTime", "endTime", "text"]){
-                  if(change.data[prop] !== undefined)
-                    subLine[prop] = change.data[prop];
-                }
-                break;
-              case "TIME_SHIFT":
-                subLine.startTime += change.data.timeShift;
-                subLine.endTime += change.data.timeShift;
-                break;
-            }
-          }
-        }
+      if(sub.format == SubtitleFormats.ASS){
+        const handler:AssChangeHandler = new AssChangeHandler();
+        return handler.ApplyChanges(<AssSubtitle>sub, changes);
+      }
+      else{
+        //TODO http error
       }
 
-      return sub;
+
     }
 
 }
