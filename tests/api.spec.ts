@@ -3,7 +3,9 @@ import { getNestMongoApp } from './setupServer';
 var fs = require('fs');
 require('jest');
 
+//TODO remove logs
 
+//TODO test styles and script info
 
 
 jest.setTimeout(1000 * 60); //one minute
@@ -89,32 +91,6 @@ describe('Api Tests', () => {
     });
 
 
-    it(`should /POST a simple sub`, async () => {
-
-        let res = await request(server)
-          .post('/subtitles')
-          .send({
-              lines: [
-                {
-                  text: "test111",
-                  startTime: 9400,
-                  endTime: 10100
-                },
-                {
-                  text: "test漢字ひらがなカタカナ",
-                  startTime: 999888777666,
-                  endTime: 0
-                }
-              ]
-          })
-          .expect(201);
-
-        expect(res.body.lines.length).toBe(2);
-        expect(res.body.lines[0].id).toBe(0);
-        expect(res.body.lastId).toBe(1);
-
-    });
-
 
     it(`should /POST a sub from an ass string`, async () => {
 
@@ -125,7 +101,7 @@ describe('Api Tests', () => {
           })
           .expect(201);
 
-        expect(res.body.lastId).toBe(472);
+        expect(res.body.data.lastDialogueId).toBe(472);
 
         testData.subtitles.subtitle1 = res.body;
     });
@@ -207,18 +183,21 @@ describe('Api Tests', () => {
         let res = await request(server)
           .post("/changes")
           .send({
-            line_ids: [5],
             user_id: testData.users.user1._id,
             commit_id: workingData.commit1n1t1._id,
             node_id: workingData.node1t1._id,
-            type: "EDIT",
+            operation: "EDIT",
+            subFormat: "ASS",
             data: {
-              text: "普通な漢字"
+              ids: [5],
+              section: "dialogues",
+              fields: [{name: "text", value: "普通な漢字"}]
             }
           })
           .expect(201);
 
         workingData.change1c1n1t1 = res.body;
+
 
       });
 
@@ -227,70 +206,89 @@ describe('Api Tests', () => {
         const templateChange:any = {
           user_id: testData.users.user1._id,
           commit_id: workingData.commit1n1t1._id,
-          node_id: workingData.node1t1._id
+          node_id: workingData.node1t1._id,
+          subFormat: "ASS"
         };
 
         await postChangeWithTemplate(templateChange, {
-          line_ids: [97],
-          type: "EDIT",
+          operation: "EDIT",
           data: {
-            text: "random stuff"
+            ids: [97],
+            section: "dialogues",
+            fields: [{ name: "text", value: "random stuff" }]
           }
         }).expect(201);
 
         await postChangeWithTemplate(templateChange, {
-          line_ids: [98],
-          type: "EDIT",
+          operation: "EDIT",
           data: {
-            startTime: 400100,
-            endTime: 400200
+            ids: [98],
+            section: "dialogues",
+            fields: [
+              { name: "start", value: 400100 },
+              { name: "end", value: 400200 }
+            ]
           }
         }).expect(201);
 
         await postChangeWithTemplate(templateChange, {
-          line_ids: [99],
-          type: "EDIT",
+          operation: "EDIT",
           data: {
-            endTime: 500100
+            ids: [99],
+            section: "dialogues",
+            fields: [{ name: "end", value: 500100 }]
           }
         }).expect(201);
 
         await postChangeWithTemplate(templateChange, {
-          line_ids: [100],
-          type: "EDIT",
+          operation: "EDIT",
           data: {
-            startTime: 500200
+            ids: [100],
+            section: "dialogues",
+            fields: [{ name: "start", value: 500200 },]
           }
         }).expect(201);
 
         await postChangeWithTemplate(templateChange, {
-          line_ids: [101],
-          type: "DELETE"
+          operation: "DELETE",
+          data: { ids: [101], section: "dialogues" }
         }).expect(201);
 
         await postChangeWithTemplate(templateChange, {
-          line_ids: [102, 103, 104],
-          type: "DELETE"
+          operation: "DELETE",
+          data: { ids: [102, 103, 104], section: "dialogues" }
         }).expect(201);
 
         await postChangeWithTemplate(templateChange, {
-          line_ids: [106],
-          type: "DELETE"
+          operation: "DELETE",
+          data: { ids: [106], section: "dialogues" }
         }).expect(201);
 
         await postChangeWithTemplate(templateChange, {
-          line_ids: [150, 151, 152],
-          type: "TIME_SHIFT",
+          operation: "TIME_SHIFT",
           data: {
+            ids: [150, 151, 152],
             timeShift: -80
           }
         }).expect(201);
 
         await postChangeWithTemplate(templateChange, {
-          line_ids: [153],
-          type: "TIME_SHIFT",
+          operation: "TIME_SHIFT",
           data: {
+            ids: [153],
             timeShift: 105
+          }
+        }).expect(201);
+
+        await postChangeWithTemplate(templateChange, {
+          operation: "CREATE",
+          data: {
+            section: "dialogues",
+            fields: [
+              { name: "text", value: "A newly created dialogue" },
+              { name: "start", value: 100 },
+              { name: "end", value: 101 },
+            ]
           }
         }).expect(201);
 
@@ -353,12 +351,15 @@ describe('Api Tests', () => {
         let res = await request(server)
           .post("/changes")
           .send({
-            line_ids: [88],
             user_id: testData.users.user1._id,
             commit_id: workingData.commit1n5t1._id,
             node_id: workingData.node5t1._id,
-            type: "TIME_SHIFT",
-            data: { timeShift: 50 }
+            subFormat: "ASS",
+            operation: "TIME_SHIFT",
+            data: {
+              ids: [88],
+              timeShift: 50
+            }
           })
           .expect(201);
 
@@ -368,7 +369,6 @@ describe('Api Tests', () => {
     describe("Finishing and approving another node",()=>{
 
       it("should /POST a node", async () => {
-
 
         let res = await request(server)
           .post("/nodes")
@@ -384,7 +384,6 @@ describe('Api Tests', () => {
 
       it("should /POST a commit", async () => {
 
-
         let res = await request(server)
           .post("/commits")
           .send({
@@ -394,7 +393,6 @@ describe('Api Tests', () => {
           .expect(201);
 
         workingData.commit1n2t1 = res.body;
-
       });
 
       it("should /POST a change", async () => {
@@ -402,27 +400,26 @@ describe('Api Tests', () => {
         let res = await request(server)
           .post("/changes")
           .send({
-            line_ids: [
-              1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,
-              20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,
-              36,37,38,39,40
-            ],
             user_id: testData.users.user1._id,
             commit_id: workingData.commit1n2t1._id,
             node_id: workingData.node2t1._id,
-            type: "TIME_SHIFT",
+            subFormat: "ASS",
+            operation: "TIME_SHIFT",
             data: {
+              ids: [
+                1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,
+                20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,
+                36,37,38,39,40
+              ],
               timeShift: -22
             }
           })
           .expect(201);
 
         workingData.change1c1n2t1 = res.body;
-
       });
 
       it("should /PATCH the commit with a description and telling it's done", async () => {
-
 
         let res = await request(server)
           .patch("/commit/" + workingData.commit1n2t1._id)
@@ -431,7 +428,6 @@ describe('Api Tests', () => {
             done: true
           })
           .expect(200);
-
       });
 
       it("should /PATCH the node telling it's done", async () => {
@@ -442,7 +438,6 @@ describe('Api Tests', () => {
             status: "FINISHED"
           })
           .expect(200);
-
       });
 
       it("should /PATCH the node with the adm approval", async () => {
@@ -515,6 +510,7 @@ describe('Api Tests', () => {
           .send({
             status: "APPROVED"
           })
+          //.then(r => console.log(r.body))
           .expect(200);
 
 
@@ -562,71 +558,76 @@ describe('Api Tests', () => {
         const templateChange:any = {
           user_id: testData.users.user1._id,
           commit_id: commitRes.body._id,
-          node_id: workingData.node3t1._id
+          node_id: workingData.node3t1._id,
+          subFormat: "ASS"
         };
 
         //conflict: different text
         await postChangeWithTemplate(templateChange, {
-          line_ids: [5],
-          type: "EDIT",
+          operation: "EDIT",
           data: {
-            text: "conflicting text change"
+            ids: [5],
+            section: "dialogues",
+            fields: [{ name: "text", value: "conflicting text change" }]
           }
         }).expect(201);
 
         //discarded: exact same text edit
         await postChangeWithTemplate(templateChange, {
-          line_ids: [97],
-          type: "EDIT",
+          operation: "EDIT",
           data: {
-            text: "random stuff"
+            ids: [97],
+            section: "dialogues",
+            fields: [{ name: "text", value: "random stuff" }]
           }
         }).expect(201);
 
         //conflict: the target change changes start and end time
         //and this one changes only start time
         await postChangeWithTemplate(templateChange, {
-          line_ids: [98],
-          type: "EDIT",
+          operation: "EDIT",
           data: {
-            startTime: 400150,
+            ids: [98],
+            section: "dialogues",
+            fields: [{ name: "start", value: 400150 }]
           }
         }).expect(201);
 
         //conflict: target change edits end time on line 99
         //and start and end time on line 98
         await postChangeWithTemplate(templateChange, {
-          line_ids: [98, 99],
-          type: "TIME_SHIFT",
+          operation: "TIME_SHIFT",
           data: {
+            ids: [98, 99],
             timeShift: 100
           }
         }).expect(201);
 
         //conflict: target change deletes this line
         await postChangeWithTemplate(templateChange, {
-          line_ids: [101],
-          type: "EDIT",
+          operation: "EDIT",
           data: {
-            startTime: 600100
+            ids: [101],
+            section: "dialogues",
+            fields: [{ name: "start", value: 600100 }]
           }
         }).expect(201);
 
         //conflict: target change deletes lines 102, 103, and 104 in one change,
         //and 106 in another change
         await postChangeWithTemplate(templateChange, {
-          line_ids: [104, 105, 106],
-          type: "TIME_SHIFT",
+          operation: "TIME_SHIFT",
           data: {
+            ids: [104, 105, 106],
             timeShift: 250
           }
         }).expect(201);
 
         //conflict: target change timeshifts 150, 151 and 152 by -80
         await postChangeWithTemplate(templateChange, {
-          line_ids: [151, 152],
-          type: "TIME_SHIFT",
+          operation: "TIME_SHIFT",
           data: {
+            ids: [151, 152],
             timeShift: -85
           }
         }).expect(201);
@@ -634,26 +635,28 @@ describe('Api Tests', () => {
         //no conflict: target change time shifts line 153, but this change only
         //touches the text
         await postChangeWithTemplate(templateChange, {
-          line_ids: [153],
-          type: "EDIT",
+          operation: "EDIT",
           data: {
-            text: "timeshift / text"
+            ids: [153],
+            section: "dialogues",
+            fields: [{ name: "text", value: "timeshift / text" }]
           }
         }).expect(201);
 
         //no conflict: target changes don't touch line 190
         await postChangeWithTemplate(templateChange, {
-          line_ids: [190],
-          type: "EDIT",
+          operation: "EDIT",
           data: {
-            startTime: 50220
+            ids: [190],
+            section: "dialogues",
+            fields: [{ name: "start", value: 50220 }]
           }
         }).expect(201);
 
         //no conflict: target changes don't touch line 191
         await postChangeWithTemplate(templateChange, {
-          line_ids: [191],
-          type: "DELETE"
+          operation: "DELETE",
+          data: { ids: [191], section: "dialogues" }
         }).expect(201);
 
 
@@ -677,13 +680,15 @@ describe('Api Tests', () => {
           })
           .expect(200);
 
-
         let res = await request(server)
           .patch("/node/" + workingData.node3t1._id)
           .send({
             status: "APPROVED"
           })
+          //.then(r => console.log(r.body))
           .expect(200);
+
+          //fs.writeFileSync('./res', JSON.stringify(res.body, null, 3))
 
           expect(res.body.responseCode).toBe(3);
 
@@ -701,7 +706,9 @@ describe('Api Tests', () => {
           expect(res.body.rebase.rebaseData[0].conflictingLines).toEqual([5]);
 
           expect(res.body.rebase.rebaseData[1].conflictingLines).toEqual([98]);
-          expect(res.body.rebase.rebaseData[1].conflictingDataTypes).toEqual(["startTime"]);
+          expect(res.body.rebase.rebaseData[1].conflictingDataTypes).toEqual(
+            [{"fields": ["start"], "section": "dialogues"}]
+          );
 
           expect(res.body.rebase.rebaseData[2].conflictingLines).toEqual([98,99]);
           expect(res.body.rebase.rebaseData[2].targetChanges.length).toBe(2);
@@ -807,8 +814,6 @@ describe('Api Tests', () => {
           rebaseId: workingData.rebase1n3t1._id
         }
 
-        console.log(resolvedRebase);
-
         let res = await request(server)
           .patch("/node/" + workingData.node5t1._id)
           .send({
@@ -842,7 +847,7 @@ describe('Api Tests', () => {
           .get("/changes/mainline/" + workingData.tree1._id)
           .expect(200);
 
-        expect(res.body.length).toBe(18);
+        expect(res.body.length).toBe(19);
 
         expect(res.body[0].line_ids).toEqual(workingData.change1c1n2t1.line_ids);
         expect(res.body[0].type).toEqual(workingData.change1c1n2t1.type);
@@ -869,7 +874,12 @@ describe('Api Tests', () => {
           })
           .expect(200);
 
+          fs.writeFileSync('./test', JSON.stringify(res.body, null, 3))
+
+
+
           //TODO verify the subtitle
+          //TODO test subtitle CREATION
 
       });
 

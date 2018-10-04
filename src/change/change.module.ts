@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ChangeService } from './change.service';
+import { AssChangeService } from './ass/assChange.service';
 import { ChangeSchema } from './change.schema';
 import { NodeSchema } from '../node/node.schema';
 import { TreeSchema } from '../tree/tree.schema';
@@ -15,10 +16,11 @@ import { getCollectionProvider } from '../database/database.providers';
       getCollectionProvider(NodeSchema, "Node"),
       getCollectionProvider(TreeSchema, "Tree"),
       ChangeService,
+      AssChangeService,
       PaginationService
     ],
     controllers: [ChangeController],
-    exports: [ChangeService]
+    exports: [ChangeService, AssChangeService]
 })
 export class ChangeModule {
 

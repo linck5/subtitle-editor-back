@@ -1,12 +1,10 @@
 import { Subtitle } from '../subtitle.schema';
 import { AssSubtitle, AssData, AssStyle, AssDialogue, AssScriptInfo } from '../ass/format';
-import { AssChange } from '../../change/ass/change';
+import { AssChange, AssChangeSection } from '../../change/ass/change';
 
 export class AssChangeHandler {
 
-  defaultStyleCreation = {
-    section: "styles",
-    fields: [
+  defaultStyleFields = [
       //{ name: "id", value: "number" },
       { name: "name", value: "string" },
       { name: "fontname", value: "Arial" },
@@ -31,13 +29,9 @@ export class AssChangeHandler {
       { name: "marginR", value: 10 },
       { name: "marginV", value: 10 },
       { name: "encoding", value: 0 },
-    ]
-  }
+]
 
-
-  defaultDialogueCreation = {
-    section: "styles",
-    fields: [
+  defaultDialogueFields = [
       //{ name: "id", value: "number" },
       { name: "layer", value: 0 },
       { name: "start", value: "0:00:00.00" },
@@ -49,37 +43,45 @@ export class AssChangeHandler {
       { name: "marginV", value: 0 },
       { name: "effect", value: "" },
       { name: "text", value: "" },
-    ]
-  }
-
+]
 
   async ApplyChanges(sub:AssSubtitle, changes:AssChange[]): Promise<AssSubtitle> {
 
-    //TODO validate params
 
+    //TODO validate params
 
     for (const change of changes){
 
-      const sectionName = new SectionNameFormatHelper(change.data.section);
+      if(!change.data) continue; //TODO this should be handled by vaidation instead
+
+      let sectionName;
+
+      //if section is undefined, it's because it's TIME_SHIFT, so it's dialogues
+      if(!change.data.section) change.data.section = AssChangeSection.Dialogues;
+
+      if(change.data.section){
+        sectionName = new SectionNameFormatHelper(change.data.section);
+      }
 
       if(change.operation == "CREATE"){
 
-        let sectionItem;
-        let completeChange = this['default'+sectionName.FUS+'Creation'];
+        let sectionItem:any = {};
+        let defaultFields = this['default'+sectionName.FUS+'Fields'];
 
-        Object.assign(completeChange, change);
+        for(let defaultField of defaultFields){
+          sectionItem[defaultField.name] = defaultField.value;
+        }
 
-        for(let field of completeChange.data.fields){
-          sectionItem[field.name] = field.value;
+        //change fields override the previously set default ones
+        for(let changeField of change.data.fields){
+          sectionItem[changeField.name] = changeField.value;
         }
 
         sectionItem.id = sub.data['last'+sectionName.FUS+'Id'] + 1;
-        sub.data.styles.push(sectionItem);
+        sub.data[sectionName.LP].push(sectionItem);
         sub.data['last'+sectionName.FUS+'Id']++;
-
       }
       else {
-
         const targetSectionItems:Array<AssDialogue | AssStyle> =
           sub.data[sectionName.LP].filter(
             sectionItem => change.data.ids.some(id => id == sectionItem.id)
@@ -98,9 +100,10 @@ export class AssChangeHandler {
                 sub.data[sectionName.LP].splice(subItemIndex, 1);
               break;
             case "EDIT":
+
               for(const changeField of change.data.fields){
-                if(sub.data[sectionName.LP][changeField.name] != undefined){
-                  sub.data[sectionName.LP][changeField.name] = changeField.value;
+                if(subItem[changeField.name] != undefined){
+                  subItem[changeField.name] = changeField.value;
                 }
               }
               break;
@@ -112,9 +115,9 @@ export class AssChangeHandler {
         }
       }
     }
-
     return sub;
   }
+
 
 }
 

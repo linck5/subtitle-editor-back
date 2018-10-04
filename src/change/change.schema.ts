@@ -1,12 +1,19 @@
 import { Document, Schema } from 'mongoose';
 var mongoosePaginate = require('mongoose-paginate');
 
+export enum ChangeOperation {
+    Create = "CREATE",
+    Edit = "EDIT",
+    TimeShift = "TIME_SHIFT",
+    Delete = "DELETE"
+}
+
 export interface Change extends Document {
   user_id: Schema.Types.ObjectId;
   commit_id: Schema.Types.ObjectId;
   node_id: Schema.Types.ObjectId;
   creation: Date;
-  operation: string;
+  operation: ChangeOperation;
   data: any;
 }
 

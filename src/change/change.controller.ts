@@ -1,12 +1,17 @@
 import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body, Delete,
   HttpException } from '@nestjs/common';
 import { ChangeService } from './change.service';
+import { AssChangeService } from './ass/assChange.service';
 import { CreateChangeDTO, ListChangeDTO, changeOrderByParams} from './change.dtos';
+import { CreateAssChangeDTO} from './ass/change.dtos';
 import { OrderByPipe } from '../common/orderBy/orderBy.pipe';
 
 @Controller()
 export class ChangeController {
-  constructor(private readonly changeService: ChangeService) { }
+  constructor(
+    private readonly changeService: ChangeService,
+    private readonly assChangeService: AssChangeService
+  ) { }
 
 
   @Get('/changes')
@@ -41,14 +46,16 @@ export class ChangeController {
 
 
   @Post('/changes')
-  async Create( @Body() addChangeDTO:CreateChangeDTO) {
-    return await this.changeService.Create(addChangeDTO)
+  async Create( @Body() createChangeDTO:CreateChangeDTO) {
+    return await this.assChangeService.Create(createChangeDTO)
     .catch(err => {
       throw new HttpException({
         error: err
       }, HttpStatus.BAD_REQUEST);
     });
   }
+
+
 
   @Delete('/change/:change_id')
   async Delete( @Param('change_id') change_id) {

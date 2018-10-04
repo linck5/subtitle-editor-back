@@ -5,6 +5,10 @@ import { validate, ValidatorOptions, ValidationError } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
 
+import { CreateChangeDTO } from '../change/change.dtos';
+import { CreateAssChangeDTO } from '../change/ass/change.dtos';
+
+
 @Injectable()
 export class DTOValidationPipe implements PipeTransform<any> {
 
@@ -17,6 +21,18 @@ export class DTOValidationPipe implements PipeTransform<any> {
   async transform(dto, {metatype, type}: ArgumentMetadata) {
 
     if(type == 'param') return dto;
+
+    if(metatype == CreateChangeDTO){
+      if(dto.subformat){
+        switch(dto.subformat){
+          case "ASS": metatype = CreateAssChangeDTO; break;
+          default: throw new HttpException({
+            code: 'validationError',
+            message: `Invalid value for "subFormat": ${dto.subformat}`
+          }, HttpStatus.BAD_REQUEST);
+        }
+      }
+    }
 
     const dtoClass = plainToClass(metatype, dto);
 

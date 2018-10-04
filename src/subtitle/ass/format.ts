@@ -7,7 +7,7 @@ export interface AssSubtitle extends Subtitle {
 };
 
 export interface AssData {
-  scriptInfo: AssScriptInfo;
+  scriptInfo: AssScriptInfo[];
   dialogues: AssDialogue[];
   lastDialogueId: number;
   styles: AssStyle[];
@@ -15,17 +15,8 @@ export interface AssData {
 }
 
 export interface AssScriptInfo {
-  title: string;
-  scriptType: string;
-  wrapStyle: number;
-  playResX: number;
-  playResY: number;
-  scaledBorderAndShadow: boolean;
-  lastStyleStorage: string;
-  videoFile: string;
-  videoAspectRatio: number;
-  videoZoom: number;
-  videoPosition: number;
+  prop: string;
+  value: string | number | boolean;
 }
 
 export interface AssStyle {

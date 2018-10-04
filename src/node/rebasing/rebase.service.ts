@@ -60,7 +60,6 @@ export class RebaseService {
   }
 
   async Create(tree:Tree, sourceNode:Node): Promise<Rebase> {
-
     const targetLineIds:Schema.Types.ObjectId[] =
       (await this.nodeModel.find({
         tree_id: tree._id,
@@ -84,7 +83,6 @@ export class RebaseService {
       case SubtitleFormats.ASS:
         rebaseDataManager = new AssRebaseDataManager();
     }
-
     rebaseDataManager.Compose(sourceChanges, targetLineChanges);
 
     const NewRebase = new this.rebaseModel({

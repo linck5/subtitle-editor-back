@@ -1,7 +1,8 @@
 import { RebaseData } from '../rebase.schema';
 import { IRebaseDataManager } from '../IRebaseDataManager';
 import { AssConflict } from './conflict';
-import { AssChange } from '../../../change/change.schema';
+import { ChangeOperation } from '../../../change/change.schema';
+import { AssChange, AssChangeSection } from '../../../change/ass/change';
 
 export class AssRebaseDataManager implements IRebaseDataManager {
 
@@ -16,13 +17,26 @@ export class AssRebaseDataManager implements IRebaseDataManager {
     this.hasConflicts = false;
 
     for(const sChange of sourceChanges){
-
       this.conflict = null;
       this.pushChange = true;
 
       for(const tChange of targetLineChanges){
 
-        if(sChange.data.section == tChange.data.section){
+        //creation changes don't have conflicts
+        if(
+          sChange.operation == ChangeOperation.Create ||
+          tChange.operation == ChangeOperation.Create
+        ) continue;
+
+        const sSec = sChange.data.section;
+        const tSec = tChange.data.section;
+
+        if(
+          sSec == tSec ||
+          (sSec == undefined && tSec == AssChangeSection.Dialogues) ||
+          (tSec == undefined && sSec == AssChangeSection.Dialogues)
+          //section is undefined on TIME_SHIFT operation
+        ){
           for(const sLineId of sChange.data.ids){
             for(const tLineId of tChange.data.ids){
 
@@ -32,8 +46,9 @@ export class AssRebaseDataManager implements IRebaseDataManager {
             }
           }
         }
-
       }
+
+
 
       if(this.conflict){
         this.rebaseData.push(this.conflict);
@@ -46,7 +61,7 @@ export class AssRebaseDataManager implements IRebaseDataManager {
         change.change_id = sChange._id;
         change._id = undefined;
 
-        this.rebaseData.push(sChange);
+        this.rebaseData.push(change);
       }
     }
   }
@@ -109,14 +124,15 @@ export class AssRebaseDataManager implements IRebaseDataManager {
       case "EDIT - TIME_SHIFT":
       case "TIME_SHIFT - EDIT":
 
-        for(let change of [sChange, tChange]){
-          for(let fieldName of ["start", "end"]){
-            if(
-              change.data.fields.find(field => field.name == fieldName)
-              != undefined
-            ){
-              conflictingDataTypes.Add(change.data.section, fieldName);
-            }
+        let editChange = sChange.operation == ChangeOperation.Edit? sChange: tChange;
+
+        for(let fieldName of ["start", "end"]){
+
+          if(
+            editChange.data.fields.find(field => field.name == fieldName)
+            != undefined
+          ){
+            conflictingDataTypes.Add(editChange.data.section, fieldName);
           }
         }
 
@@ -144,7 +160,10 @@ export class AssRebaseDataManager implements IRebaseDataManager {
         conflictingLines: [conflictingId],
         sourceChange: sChange,
         targetChanges: [tChange],
-        conflictingDataTypes: conflictingDataTypes.GetForConflictAssignment()
+        conflictingDataTypes: conflictingDataTypes?
+          conflictingDataTypes.GetForConflictAssignment()
+          :
+          undefined
 
       }
     }
@@ -171,7 +190,7 @@ class ConflictingDataTypes {
     else return undefined;
   }
 
-  Add (section:string, field:string){
+  Add (section:AssChangeSection, field:string){
 
     let existingSection =
       this.obj.find(cDataType => cDataType.section == section);

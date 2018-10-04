@@ -6,8 +6,6 @@ import { Schema } from 'mongoose';
 import { Type } from 'class-transformer';
 
 
-
-
 export class CreateChangeDTO {
 
   @IsDefined()
@@ -25,12 +23,24 @@ export class CreateChangeDTO {
   @IsDefined()
   @IsString()
   @Matches(/(?:CREATE)|(?:EDIT)|(?:TIME_SHIFT)|(?:DELETE)/)
-  readonly type: string;
+  readonly operation: string;
+
+  @IsDefined()
+  @IsString()
+  @Matches(/(?:ASS)/)
+  readonly subformat: string;
+
+  @IsDefined()
+  readonly data: any;
 
 }
 
 
 export class RebasedChangeDTO {
+
+  @IsDefined()
+  @IsMongoId()
+  readonly _id: Schema.Types.ObjectId;
 
   @IsDefined()
   @IsMongoId()
@@ -47,11 +57,14 @@ export class RebasedChangeDTO {
   @IsDefined()
   @IsString()
   @Matches(/(?:CREATE)|(?:EDIT)|(?:TIME_SHIFT)|(?:DELETE)/)
-  readonly type: string;
+  readonly operation: string;
 
   @IsDefined()
   @IsDateString()
   readonly creation: string;
+
+  @IsDefined()
+  readonly data: any;
 
 }
 

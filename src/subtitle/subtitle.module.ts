@@ -4,7 +4,6 @@ import { AssConverterService } from './assConverter.service';
 import { SubtitleSchema } from './subtitle.schema';
 import { DatabaseModule } from '../database/database.module';
 import { getCollectionProvider } from '../database/database.providers';
-import { LineSchema } from './line/line.schema';
 import { SubtitleController } from './subtitle.controller';
 
 
@@ -12,7 +11,6 @@ import { SubtitleController } from './subtitle.controller';
     imports: [DatabaseModule],
     providers: [
       getCollectionProvider(SubtitleSchema, "Subtitle"),
-      getCollectionProvider(LineSchema, "Line"),
       SubtitleService,
       AssConverterService
     ],
