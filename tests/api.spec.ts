@@ -1,5 +1,9 @@
 import * as request from 'supertest';
 import { getNestMongoApp } from './setupServer';
+import mockDataFactory from './mockChanges/mockDataFactory';
+import { commit1n1t1_Mock } from './mockChanges/commit1n1t1.mock';
+import { commit1n3t1_Mock } from './mockChanges/commit1n3t1.mock';
+
 var fs = require('fs');
 require('jest');
 
@@ -15,7 +19,9 @@ describe('Api Tests', () => {
 
 
   var server;
-  var testData = {
+
+  let workingData = {
+
     users: {
       adm1: null,
       user1: null,
@@ -26,8 +32,29 @@ describe('Api Tests', () => {
     },
     subtitles: {
       subtitle1: null
-    }
-  };
+    },
+
+    tree1: null,
+
+    mlChanges1: null,
+
+    node1t1: null,
+    commit1n1t1: null,
+    change1c1n1t1: null,
+
+    node2t1: null,
+    commit1n2t1: null,
+    change1c1n2t1: null,
+
+    node3t1: null,
+    commit1n3t1: null,
+    rebase1n3t1: null,
+
+    node4t1: null,
+
+    node5t1: null,
+    commit1n5t1: null
+  }
 
   const postChangeWithTemplate = (template, change) =>{
     return request(server)
@@ -59,8 +86,8 @@ describe('Api Tests', () => {
         })
         .expect(201);
 
-      testData.users.adm1 = res1.body;
-      testData.users.user1 = res2.body;
+      workingData.users.adm1 = res1.body;
+      workingData.users.user1 = res2.body;
 
 
     });
@@ -86,8 +113,8 @@ describe('Api Tests', () => {
         })
         .expect(201);
 
-      testData.videos.video1 = res1.body;
-      testData.videos.video2 = res2.body;
+      workingData.videos.video1 = res1.body;
+      workingData.videos.video2 = res2.body;
     });
 
 
@@ -103,33 +130,13 @@ describe('Api Tests', () => {
 
         expect(res.body.data.lastDialogueId).toBe(472);
 
-        testData.subtitles.subtitle1 = res.body;
+        workingData.subtitles.subtitle1 = res.body;
     });
   });
 
   describe('Simulate the API flow', () => {
 
-    let workingData = {
-      tree1: null,
 
-      mlChanges1: null,
-
-      node1t1: null,
-      commit1n1t1: null,
-      change1c1n1t1: null,
-
-      node2t1: null,
-      commit1n2t1: null,
-      change1c1n2t1: null,
-
-      node3t1: null,
-      rebase1n3t1: null,
-
-      node4t1: null,
-
-      node5t1: null,
-      commit1n5t1: null
-    }
 
     describe("tree creation and first node with a commit and a change", ()=>{
 
@@ -140,8 +147,8 @@ describe('Api Tests', () => {
           .send({
             language: "jp",
             description: "a test tree",
-            video_id: testData.videos.video2._id,
-            subtitle_id: testData.subtitles.subtitle1._id
+            video_id: workingData.videos.video2._id,
+            subtitle_id: workingData.subtitles.subtitle1._id
           })
           .expect(201);
 
@@ -155,7 +162,7 @@ describe('Api Tests', () => {
         let res = await request(server)
           .post("/nodes")
           .send({
-            creator_id: testData.users.user1._id,
+            creator_id: workingData.users.user1._id,
             tree_id: workingData.tree1._id
           })
           .expect(201);
@@ -183,7 +190,7 @@ describe('Api Tests', () => {
         let res = await request(server)
           .post("/changes")
           .send({
-            user_id: testData.users.user1._id,
+            user_id: workingData.users.user1._id,
             commit_id: workingData.commit1n1t1._id,
             node_id: workingData.node1t1._id,
             operation: "EDIT",
@@ -203,95 +210,18 @@ describe('Api Tests', () => {
 
       it("should /POST some more different types of change to be tested on conflicts later", async () => {
 
-        const templateChange:any = {
-          user_id: testData.users.user1._id,
-          commit_id: workingData.commit1n1t1._id,
-          node_id: workingData.node1t1._id,
-          subFormat: "ASS"
-        };
 
-        await postChangeWithTemplate(templateChange, {
-          operation: "EDIT",
-          data: {
-            ids: [97],
-            section: "dialogues",
-            fields: [{ name: "text", value: "random stuff" }]
-          }
-        }).expect(201);
 
-        await postChangeWithTemplate(templateChange, {
-          operation: "EDIT",
-          data: {
-            ids: [98],
-            section: "dialogues",
-            fields: [
-              { name: "start", value: 400100 },
-              { name: "end", value: 400200 }
-            ]
-          }
-        }).expect(201);
 
-        await postChangeWithTemplate(templateChange, {
-          operation: "EDIT",
-          data: {
-            ids: [99],
-            section: "dialogues",
-            fields: [{ name: "end", value: 500100 }]
-          }
-        }).expect(201);
+        let data = mockDataFactory(workingData, commit1n1t1_Mock)
 
-        await postChangeWithTemplate(templateChange, {
-          operation: "EDIT",
-          data: {
-            ids: [100],
-            section: "dialogues",
-            fields: [{ name: "start", value: 500200 },]
-          }
-        }).expect(201);
-
-        await postChangeWithTemplate(templateChange, {
-          operation: "DELETE",
-          data: { ids: [101], section: "dialogues" }
-        }).expect(201);
-
-        await postChangeWithTemplate(templateChange, {
-          operation: "DELETE",
-          data: { ids: [102, 103, 104], section: "dialogues" }
-        }).expect(201);
-
-        await postChangeWithTemplate(templateChange, {
-          operation: "DELETE",
-          data: { ids: [106], section: "dialogues" }
-        }).expect(201);
-
-        await postChangeWithTemplate(templateChange, {
-          operation: "TIME_SHIFT",
-          data: {
-            ids: [150, 151, 152],
-            timeShift: -80
-          }
-        }).expect(201);
-
-        await postChangeWithTemplate(templateChange, {
-          operation: "TIME_SHIFT",
-          data: {
-            ids: [153],
-            timeShift: 105
-          }
-        }).expect(201);
-
-        await postChangeWithTemplate(templateChange, {
-          operation: "CREATE",
-          data: {
-            section: "dialogues",
-            fields: [
-              { name: "text", value: "A newly created dialogue" },
-              { name: "start", value: 100 },
-              { name: "end", value: 101 },
-            ]
-          }
-        }).expect(201);
-
+        for(let toSend of data){
+          await request(server)
+            .post("/changes")
+            .send(toSend)
+            //.then(r => {console.log(r.body)})
+            .expect(201);
+        }
 
       });
 
@@ -304,7 +234,7 @@ describe('Api Tests', () => {
         let res = await request(server)
           .post("/nodes")
           .send({
-            creator_id: testData.users.user1._id,
+            creator_id: workingData.users.user1._id,
             tree_id: workingData.tree1._id
           })
         .expect(201);
@@ -322,7 +252,7 @@ describe('Api Tests', () => {
         let res = await request(server)
           .post("/nodes")
           .send({
-            creator_id: testData.users.user1._id,
+            creator_id: workingData.users.user1._id,
             tree_id: workingData.tree1._id
           })
         .expect(201);
@@ -351,7 +281,7 @@ describe('Api Tests', () => {
         let res = await request(server)
           .post("/changes")
           .send({
-            user_id: testData.users.user1._id,
+            user_id: workingData.users.user1._id,
             commit_id: workingData.commit1n5t1._id,
             node_id: workingData.node5t1._id,
             subFormat: "ASS",
@@ -373,7 +303,7 @@ describe('Api Tests', () => {
         let res = await request(server)
           .post("/nodes")
           .send({
-            creator_id: testData.users.user1._id,
+            creator_id: workingData.users.user1._id,
             tree_id: workingData.tree1._id
           })
           .expect(201);
@@ -400,7 +330,7 @@ describe('Api Tests', () => {
         let res = await request(server)
           .post("/changes")
           .send({
-            user_id: testData.users.user1._id,
+            user_id: workingData.users.user1._id,
             commit_id: workingData.commit1n2t1._id,
             node_id: workingData.node2t1._id,
             subFormat: "ASS",
@@ -487,13 +417,13 @@ describe('Api Tests', () => {
         expect(node1.isInMainline).toBeTruthy();
         expect(node1.mlBaseIndex).toBe(0);
         expect(node1.collaborators.length).toBe(1);
-        expect(node1.collaborators[0].user_id).toBe(testData.users.user1._id);
+        expect(node1.collaborators[0].user_id).toBe(workingData.users.user1._id);
         expect(node1.source_id).toBeUndefined();
 
         expect(node2.isInMainline).toBeFalsy();
         expect(node2.mlBaseIndex).toBe(0);
         expect(node2.collaborators.length).toBe(1);
-        expect(node2.collaborators[0].user_id).toBe(testData.users.user1._id);
+        expect(node2.collaborators[0].user_id).toBe(workingData.users.user1._id);
         expect(node2.source_id).toBeUndefined();
 
       });
@@ -546,7 +476,7 @@ describe('Api Tests', () => {
       test("make conflicting changes in node node3t1", async ()=>{
 
 
-        let commitRes = await request(server)
+        let res = await request(server)
           .post("/commits")
           .send({
             description: "",
@@ -554,115 +484,22 @@ describe('Api Tests', () => {
           })
           .expect(201);
 
+        workingData.commit1n3t1 = res.body;
 
-        const templateChange:any = {
-          user_id: testData.users.user1._id,
-          commit_id: commitRes.body._id,
-          node_id: workingData.node3t1._id,
-          subFormat: "ASS"
-        };
+        let data = mockDataFactory(workingData, commit1n3t1_Mock);
 
-        //conflict: different text
-        await postChangeWithTemplate(templateChange, {
-          operation: "EDIT",
-          data: {
-            ids: [5],
-            section: "dialogues",
-            fields: [{ name: "text", value: "conflicting text change" }]
-          }
-        }).expect(201);
-
-        //discarded: exact same text edit
-        await postChangeWithTemplate(templateChange, {
-          operation: "EDIT",
-          data: {
-            ids: [97],
-            section: "dialogues",
-            fields: [{ name: "text", value: "random stuff" }]
-          }
-        }).expect(201);
-
-        //conflict: the target change changes start and end time
-        //and this one changes only start time
-        await postChangeWithTemplate(templateChange, {
-          operation: "EDIT",
-          data: {
-            ids: [98],
-            section: "dialogues",
-            fields: [{ name: "start", value: 400150 }]
-          }
-        }).expect(201);
-
-        //conflict: target change edits end time on line 99
-        //and start and end time on line 98
-        await postChangeWithTemplate(templateChange, {
-          operation: "TIME_SHIFT",
-          data: {
-            ids: [98, 99],
-            timeShift: 100
-          }
-        }).expect(201);
-
-        //conflict: target change deletes this line
-        await postChangeWithTemplate(templateChange, {
-          operation: "EDIT",
-          data: {
-            ids: [101],
-            section: "dialogues",
-            fields: [{ name: "start", value: 600100 }]
-          }
-        }).expect(201);
-
-        //conflict: target change deletes lines 102, 103, and 104 in one change,
-        //and 106 in another change
-        await postChangeWithTemplate(templateChange, {
-          operation: "TIME_SHIFT",
-          data: {
-            ids: [104, 105, 106],
-            timeShift: 250
-          }
-        }).expect(201);
-
-        //conflict: target change timeshifts 150, 151 and 152 by -80
-        await postChangeWithTemplate(templateChange, {
-          operation: "TIME_SHIFT",
-          data: {
-            ids: [151, 152],
-            timeShift: -85
-          }
-        }).expect(201);
-
-        //no conflict: target change time shifts line 153, but this change only
-        //touches the text
-        await postChangeWithTemplate(templateChange, {
-          operation: "EDIT",
-          data: {
-            ids: [153],
-            section: "dialogues",
-            fields: [{ name: "text", value: "timeshift / text" }]
-          }
-        }).expect(201);
-
-        //no conflict: target changes don't touch line 190
-        await postChangeWithTemplate(templateChange, {
-          operation: "EDIT",
-          data: {
-            ids: [190],
-            section: "dialogues",
-            fields: [{ name: "start", value: 50220 }]
-          }
-        }).expect(201);
-
-        //no conflict: target changes don't touch line 191
-        await postChangeWithTemplate(templateChange, {
-          operation: "DELETE",
-          data: { ids: [191], section: "dialogues" }
-        }).expect(201);
+        for(let toSend of data){
+          await request(server)
+            .post("/changes")
+            .send(toSend)
+            //.then(r => {console.log(r.body)})
+            .expect(201);
+        }
 
 
 
         await request(server)
-          .patch("/commit/" + commitRes.body._id)
+          .patch("/commit/" + workingData.commit1n3t1._id)
           .send({
             description: "conflicting commit",
             done: true
@@ -685,7 +522,6 @@ describe('Api Tests', () => {
           .send({
             status: "APPROVED"
           })
-          //.then(r => console.log(r.body))
           .expect(200);
 
           //fs.writeFileSync('./res', JSON.stringify(res.body, null, 3))
@@ -868,13 +704,13 @@ describe('Api Tests', () => {
 
       test("if the applied subtitle is correct", async ()=>{
         let res = await request(server)
-          .get("/subtitle/apply/" + testData.subtitles.subtitle1._id)
+          .get("/subtitle/apply/" + workingData.subtitles.subtitle1._id)
           .send({
             changes: workingData.mlChanges1
           })
           .expect(200);
 
-          fs.writeFileSync('./test', JSON.stringify(res.body, null, 3))
+          //fs.writeFileSync('./test', JSON.stringify(res.body, null, 3))
 
 
 
