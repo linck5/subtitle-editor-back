@@ -14,6 +14,8 @@ require('jest');
 
 jest.setTimeout(1000 * 60); //one minute
 
+const outputPath = "./tests/output/";
+
 
 describe('Api Tests', () => {
 
@@ -683,7 +685,7 @@ describe('Api Tests', () => {
           .get("/changes/mainline/" + workingData.tree1._id)
           .expect(200);
 
-        expect(res.body.length).toBe(19);
+        expect(res.body.length).toBe(22);
 
         expect(res.body[0].line_ids).toEqual(workingData.change1c1n2t1.line_ids);
         expect(res.body[0].type).toEqual(workingData.change1c1n2t1.type);
@@ -710,7 +712,7 @@ describe('Api Tests', () => {
           })
           .expect(200);
 
-          //fs.writeFileSync('./test', JSON.stringify(res.body, null, 3))
+          fs.writeFileSync(outputPath + 'appliedSub', JSON.stringify(res.body, null, 3))
 
 
 
