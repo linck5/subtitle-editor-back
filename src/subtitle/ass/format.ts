@@ -36,14 +36,14 @@ export interface AssStyle {
   scaleY: number;
   spacing: number;
   angle: number;
-  borderStyle: string;
+  borderStyle: number;
   outline: number;
   shadow: number;
   alignment: number;
   marginL: number;
   marginR: number;
   marginV: number;
-  encoding: string;
+  encoding: number;
 }
 
 export interface AssDialogue {
