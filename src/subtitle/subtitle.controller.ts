@@ -1,8 +1,10 @@
 import { Controller, Post, HttpStatus, Param, Get, Body, Delete,
   HttpException } from '@nestjs/common';
 import { SubtitleService } from './subtitle.service';
+import { ApplySubtitleDTO} from './subtitle.dtos';
+
 import { CreateSubtitleFromASSFileDTO,
-ApplySubtitleDTO} from './subtitle.dtos';
+ ConvertToAssStringDTO} from './ass/subtitle.dtos';
 
 @Controller()
 export class SubtitleController {
@@ -28,6 +30,23 @@ export class SubtitleController {
         error: err
       }, HttpStatus.BAD_REQUEST);
     });
+  }
+
+  @Get('/convertsubtitle')
+  async ConvertToAssString( @Body() dto:ConvertToAssStringDTO) {
+    if(process.env.TEST_ENV){
+      return await this.subtitleService.ConvertToASSString(dto.subtitleobj)
+      .catch(err => {
+        throw new HttpException({
+          error: err
+        }, HttpStatus.BAD_REQUEST);
+      });
+    }
+    else{
+      throw new HttpException({
+        error: "Server is not on a test environment"
+      }, HttpStatus.BAD_REQUEST);
+    }
   }
 
 

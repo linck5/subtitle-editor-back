@@ -724,6 +724,43 @@ describe('Api Tests', () => {
 
     });
 
+    describe("ASS to subtitle obj conversion", ()=>{
+
+      it('should convert a subtitle to ass string correctly', async () => {
+
+        let res = await request(server)
+          .get("/convertsubtitle")
+          .send({
+            subtitleObj: workingData.subtitles.subtitle1
+          })
+          .expect(200);
+
+
+        fs.writeFileSync(outputPath + 'convertedAssString', res.text)
+
+      });
+
+      test(
+        `the converted ass string, when converted to subtitle obj again
+        should be the same as the original subtitle`, async () => {
+
+
+        let res = await request(server)
+          .post('/subtitles/fromAss')
+          .send({
+              assstring: fs.readFileSync(outputPath + 'convertedAssString', "utf8")
+          })
+          .expect(201);
+
+        expect(res.body.data).toEqual(workingData.subtitles.subtitle1.data)
+
+      });
+
+
+    });
+
+
+
   });
 
 

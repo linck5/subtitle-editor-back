@@ -20,6 +20,11 @@ export class SubtitleService {
       return await this.assConverterService.AssString2Subtitle(assFile).save();
     }
 
+    async ConvertToASSString(sub): Promise<string> {
+
+      return await this.assConverterService.Subtitle2AssString(sub);
+    }
+
 
     async Delete(id): Promise<Subtitle> {
       return await this.subtitleModel.findByIdAndRemove(id);

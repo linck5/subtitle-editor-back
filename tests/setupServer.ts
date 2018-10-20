@@ -1,7 +1,9 @@
+import * as dotenv from 'dotenv';
+dotenv.config({path: '.env.development'});
+
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import { Test } from '@nestjs/testing';
-
 
 import { SubtitleModule } from '../src/subtitle/subtitle.module';
 import { UserModule } from '../src/user/user.module';
@@ -22,7 +24,7 @@ import { LowercaseReqKeysPipe } from '../src/common/lowercaseReqKeys.pipe';
 export async function getNestMongoApp(){
 
   const server = express();
-  server.use(bodyParser.json());
+  server.use(bodyParser.json({limit: '50mb'}));
 
   const module = await Test.createTestingModule({
       imports: [UserModule, NodeModule, ChangeModule,
