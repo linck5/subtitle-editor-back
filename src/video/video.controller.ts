@@ -13,6 +13,7 @@ export class VideoController {
   @Get('/videos')
   async List( @Query(new OrderByPipe(videoOrderByParams)) query:ListVideoDTO ) {
     return await this.videoService.List(query)
+    .then(res => res.docs)
     .catch(err => {
       throw new HttpException({
         error: err

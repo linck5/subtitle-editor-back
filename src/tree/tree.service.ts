@@ -130,7 +130,8 @@ export class TreeService {
 
       let query:any = {};
 
-  const options = this.paginationService.PaginateOptionsFromDto(dto);
+      const options = this.paginationService.PaginateOptionsFromDto(dto);
+      if(dto.ids) query['_id'] = { $in : dto.ids}
 
       return await this.paginateTreeModel.paginate(query, options);
 

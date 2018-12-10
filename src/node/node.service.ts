@@ -234,11 +234,12 @@ export class NodeService {
       return await this.nodeModel.findById(id);
     }
 
-
     async List(dto:ListNodeDTO): Promise<PaginateResult<Node>> {
 
       let query:any = {};
       if(dto.isInMainline != undefined) query.isInMainline = dto.isInMainline;
+
+      if(dto.ids) query['_id'] = { $in : dto.ids}
 
       const options = this.paginationService.PaginateOptionsFromDto(dto);
 

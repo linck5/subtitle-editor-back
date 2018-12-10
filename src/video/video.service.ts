@@ -51,6 +51,8 @@ export class VideoService {
 
       const options = this.paginationService.PaginateOptionsFromDto(dto);
 
+      if(dto.ids) query['_id'] = { $in : dto.ids}
+
       return await this.paginateVideoModel.paginate(query, options);
 
     }

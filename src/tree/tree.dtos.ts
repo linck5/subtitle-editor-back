@@ -1,5 +1,5 @@
 
-import { IsString, IsInt, IsDefined, IsMongoId, IsBoolean, IsDate
+import { IsString, IsInt, IsDefined, IsMongoId, IsBoolean, IsDate, IsArray
  } from 'class-validator';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 import { Schema } from 'mongoose';
@@ -33,6 +33,9 @@ export class UpdateTreeDTO {
 }
 
 export class ListTreeDTO {
+
+  @IsArray()
+  readonly ids: number[];
 
   @IsInt()
   readonly limit: number;

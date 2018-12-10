@@ -12,6 +12,7 @@ export class NodeController {
   @Get('/nodes')
   async List( @Query(new OrderByPipe(nodeOrderByParams)) query:ListNodeDTO ) {
     return await this.nodeService.List(query)
+    .then(res => res.docs)
     .catch(err => {
       throw new HttpException({
         error: err

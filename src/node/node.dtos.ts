@@ -1,6 +1,7 @@
 
 import { IsString, IsInt, IsBoolean, ValidateNested, IsMongoId, IsDefined,
-Matches } from 'class-validator';
+Matches, 
+IsArray} from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 import { UpdateNodeCollaboratorDTO } from './collaborator/collaborator.dtos';
@@ -36,6 +37,9 @@ export class UpdateNodeDTO {
 }
 
 export class ListNodeDTO {
+
+  @IsArray()
+  readonly ids: number[];
 
   @IsBoolean()
   readonly isInMainline: boolean;

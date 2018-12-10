@@ -12,6 +12,7 @@ export class TreeController {
   @Get('/trees')
   async List( @Query(new OrderByPipe(treeOrderByParams)) query:ListTreeDTO ) {
     return await this.treeService.List(query)
+    .then(res => res.docs)
     .catch(err => {
       throw new HttpException({
         error: err

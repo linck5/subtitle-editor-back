@@ -1,5 +1,5 @@
 
-import { IsString, IsInt, IsUrl, IsMongoId, IsDefined } from 'class-validator';
+import { IsString, IsInt, IsUrl, IsMongoId, IsDefined, IsArray } from 'class-validator';
 import { OrderByParam } from '../common/orderBy/orderByParamFormat';
 
 
@@ -49,6 +49,9 @@ export class UpdateVideoDTO {
 }
 
 export class ListVideoDTO {
+
+  @IsArray()
+  readonly ids: number[];
 
   @IsInt()
   readonly limit: number;
