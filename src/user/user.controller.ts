@@ -1,5 +1,6 @@
 import { Controller, Post, HttpStatus, Param, Query, Get, Patch, Body, Delete,
-  HttpException } from '@nestjs/common';
+  HttpException, 
+  Req} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { CreateUserDTO, UpdateUserDTO, ListUserDTO, userOrderByParams,
 GetUserByNameDTO } from './user.dtos';
@@ -40,6 +41,19 @@ export class UserController {
       }, HttpStatus.BAD_REQUEST);
     });
   }
+
+  //matt code
+  //returns user info based on the JWT payload
+  @Get('/userjwt')
+  async GetByJwt( @Req() request:any) {
+    return await this.userService.FindByName(request.user.username)
+    .catch(err => {
+      throw new HttpException({
+        error: err
+      }, HttpStatus.BAD_REQUEST);
+    });
+  }
+  // /matt code
 
   @Post('/users')
   async Create( @Body() addUserDTO:CreateUserDTO) {
