@@ -18,7 +18,7 @@
     "@nestjs/mongoose": "^5.0.0",
     "@nestjs/websockets": "^5.0.1",
     "ass-compiler": "0.0.9",
-    "bcrypt": "^1.0.3",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.18.2",
     "class-transformer": "^0.1.9",
     "class-validator": "^0.8.5",
